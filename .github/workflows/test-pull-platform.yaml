@@ -1,6 +1,6 @@
 name: Test Pull Platform
 on: 
-  push:
+  # push:
   workflow_dispatch:
 
 env:
