@@ -1,6 +1,11 @@
 name: RHDH Plugin Certification Pipeline
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'partners/**/package.yaml'
   workflow_dispatch:
 
 jobs:

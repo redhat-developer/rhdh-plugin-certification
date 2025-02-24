@@ -35,7 +35,7 @@
        plugins:
          - package: oci://quay.io/tkral/backstage-community-plugin-todo:v0.1.1!backstage-community-plugin-todo
            disabled: false
-
+   ```
 
 3. Submit the PR:
 
