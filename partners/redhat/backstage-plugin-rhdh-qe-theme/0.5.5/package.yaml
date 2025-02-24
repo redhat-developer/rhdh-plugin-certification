@@ -1,0 +1,26 @@
+global:
+  dynamic:
+    plugins:
+      - package: '@pataknight/backstage-plugin-rhdh-qe-theme@0.5.5'
+        disabled: false
+        integrity: sha512-srTnFDYn3Ett6z33bX4nL2NQY8wqux8TkpgBQNsE8S73nMfsor/wAdmVgHL+xW7pxQ09DT4YTdaG3GkH+cyyNQ==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              pataknight.backstage-plugin-rhdh-qe-theme:
+                appIcons:
+                - importName: LightIcon
+                  name: lightIcon
+                - importName: DarkIcon
+                  name: darkIcon
+                themes:
+                - icon: lightIcon
+                  id: light-dynamic
+                  importName: lightThemeProvider
+                  title: Light Dynamic
+                  variant: light
+                - icon: darkIcon
+                  id: dark-dynamic
+                  importName: darkThemeProvider
+                  title: Dark Dynamic
+                  variant: dark

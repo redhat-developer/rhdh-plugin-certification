@@ -1,0 +1,366 @@
+name: RHDH Plugin Certification Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  detect-changes:
+    name: Detect PR Changes
+    runs-on: ubuntu-latest
+    outputs:
+      modified_files: ${{ steps.changed-files.outputs.all_changed_files }}
+      plugin_name: ${{ steps.extract-plugin.outputs.plugin_name }}
+      package_yaml: ${{ steps.extract-plugin.outputs.package_yaml }}
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Identify modified plugin files
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: partners/**/package.yaml
+
+      # Save repository as an artifact for later jobs
+      - name: Save Repository as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-artifact
+          path: |
+            partners/
+            values.yaml
+            app-config-rhdh.yaml
+            rhdh/
+          retention-days: 7
+
+      - name: Confirm Artifact Upload
+        run: echo "Artifact repo-artifact uploaded successfully!"
+
+      # Extract plugin name and package.yaml path
+      - name: Extract Plugin Name and Package.yaml Path
+        id: extract-plugin
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          if [[ "$file" == partners/*/*/*/package.yaml ]]; then
+            PARTNER_NAME=$(echo "$file" | cut -d'/' -f2)
+            PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
+            VERSION=$(echo "$file" | cut -d'/' -f4)
+            echo "PARTNER_NAME=$PARTNER_NAME" >> $GITHUB_OUTPUT
+            echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
+            echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          fi
+          done
+
+  setup-and-deploy:
+    name: Setup and Deploy - ${{ needs.detect-changes.outputs.plugin_name }}
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    steps:
+      # Download repository artifact
+      - name: Download Repository Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: repo-artifact
+          path: .
+
+      # Verify that the artifact exists before proceeding
+      - name: 📝 Check if Artifact Exists
+        run: |
+          echo "🔍 Checking if 'repo-artifact' exists..."
+          ARTIFACT_NAME="repo-artifact"
+
+          RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts")
+
+          echo "Response from GitHub API:"
+          echo "$RESPONSE" | jq
+
+          ARTIFACT_COUNT=$(echo "$RESPONSE" | jq "[.artifacts[]? | select(.name==\"$ARTIFACT_NAME\")] | length")
+
+          if [ "$ARTIFACT_COUNT" -eq 0 ]; then
+            echo "❌ ERROR: Artifact '$ARTIFACT_NAME' not found!"
+            exit 1
+          else
+            echo "✅ Artifact '$ARTIFACT_NAME' exists!"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup Kubeconfig before running Kubernetes commands
+      - name: Set Up Kubeconfig
+        run: |
+          echo "Creating Kubeconfig directory..."
+          sudo mkdir -p /opt/.kube
+          sudo chmod 777 /opt/.kube
+
+          echo "Writing Kubeconfig file..."
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d | sudo tee /opt/.kube/config > /dev/null
+
+          echo "Setting KUBECONFIG environment variable..."
+          export KUBECONFIG=/opt/.kube/config
+          echo "KUBECONFIG=/opt/.kube/config" >> $GITHUB_ENV
+
+          echo "Kubeconfig set up successfully!"
+
+      # Verify Kubernetes cluster connection before proceeding
+      - name: Verify Kubernetes Connection
+        run: |
+          echo "Checking Kubernetes cluster connection..."
+          export KUBECONFIG=/opt/.kube/config
+          kubectl cluster-info || { echo "ERROR: Kubernetes cluster is unreachable!"; exit 1; }
+      
+      # Install configmap for Red Hat Developer Hub
+      - name: Install ConfigMap for Red Hat Developer Hub
+        run: |
+          echo "Creating ConfigMap for Red Hat Developer Hub..."
+          kubectl apply -f app-config-rhdh.yaml -n rhdh-smoketest
+          echo "ConfigMap created successfully!"
+
+      # Install Helm and update repositories
+      - name: Set Up Helm
+        run: |
+          sudo apt update && sudo apt install -y g++ apt-transport-https curl
+
+          echo "Adding Helm repository..."
+          curl -fsSL https://baltocdn.com/helm/signing.asc | sudo tee /etc/apt/trusted.gpg.d/helm.asc > /dev/null
+          echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+          
+          sudo apt update
+          sudo apt install -y helm
+          echo "Helm installed successfully!"
+
+      # Deploy Red Hat Developer Hub
+      - name: Deploy Red Hat Developer Hub
+        run: |
+          export KUBECONFIG=/opt/.kube/config
+
+          # Remove existing Helm release if it exists
+          RELEASE_NAME=$(helm list -n rhdh-smoketest -q | grep "redhat-developer-hub" || true)
+          if [ -n "$RELEASE_NAME" ]; then
+            echo "Existing Helm release detected: $RELEASE_NAME. Uninstalling..."
+            helm uninstall "$RELEASE_NAME" --namespace rhdh-smoketest || echo "Helm uninstall failed, but continuing..."
+            sleep 10  # Ensure cleanup completes
+          else
+            echo "No existing Helm release found. Proceeding with installation."
+          fi
+
+          # Proceed with installation
+          helm repo add openshift-helm-charts https://charts.openshift.io/
+          helm repo update
+          helm install -f values.yaml \
+            redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
+            --namespace rhdh-smoketest --create-namespace
+
+      # Install dynamic plugin if there are changes
+      - name: Install Dynamic Plugin
+        if: ${{ needs.detect-changes.outputs.modified_files != '' }}
+        run: |
+          helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "${{ needs.detect-changes.outputs.package_yaml }}" \
+            redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
+            --namespace rhdh-smoketest
+
+  run-smoke-tests:
+    name: Run Smoke Tests
+    runs-on: ubuntu-latest
+    needs: setup-and-deploy
+    env:
+      BASE_URL: https://redhat-developer-hub-rhdh-smoketest.apps.dancurran-lab2025.opdev.io/
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            ~/.cache/yarn
+            rhdh/node_modules
+            rhdh/e2e-tests/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-  
+
+      - name: Ensure RHDH Repository Exists
+        run: |
+          if [ ! -d "rhdh" ]; then
+            echo "RHDH repository not found. Cloning..."
+            git clone https://github.com/redhat-developer/rhdh.git
+          else
+            echo "RHDH repository already exists."
+          fi
+      - name: Verify RHDH Directory
+        run: |
+          if [ ! -d "rhdh" ]; then
+            echo "❌ ERROR: RHDH directory is missing!"
+            exit 1
+          else
+            echo "✅ RHDH directory found."
+          fi    
+
+      - name: Install Dependencies
+        run: |
+          cd rhdh
+          yarn install
+
+      - name: Install Playwright Dependencies
+        run: |
+          cd rhdh/e2e-tests
+          yarn playwright install chromium
+
+      - name: Run Playwright Smoke Test
+        working-directory: rhdh/e2e-tests
+        run: |
+          yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
+      # ✅ Upload Playwright Report inside the same job
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: rhdh/e2e-tests/playwright-report/
+          retention-days: 7
+          if-no-files-found: warn
+          include-hidden-files: true
+
+      - name: Verify Playwright Report Before Upload
+        if: always()
+        run: |
+          echo "🔍 Checking if Playwright report directory exists..."
+          if [ -d "rhdh/e2e-tests/playwright-report" ]; then
+            echo "✅ Playwright report directory found!"
+            echo "🔍 Listing contents:"
+            ls -lah rhdh/e2e-tests/playwright-report
+          else
+            echo "❌ ERROR: Playwright report directory NOT found!"
+          fi
+
+      - name: Show current working directory and contents
+        if: always()
+        run: |
+          echo "📂 Current working directory:"
+          pwd
+          echo "🔍 Listing contents of current directory:"
+          ls -lah
+
+      - name: Show one level up directory
+        if: always()
+        run: |
+          echo "🔍 Listing contents of parent directory:"
+          ls -lah ..
+
+      - name: Attempt to find Playwright Report
+        if: always()
+        run: |
+          echo "🔍 Trying to locate 'rhdh' directory and navigate into it..."
+          if [ -d "rhdh" ]; then
+            cd rhdh
+            echo "✅ Successfully entered 'rhdh' directory."
+            echo "🔍 Listing contents inside 'rhdh':"
+            ls -lah
+          
+            if [ -d "e2e-tests" ]; then
+              cd e2e-tests
+              echo "✅ Successfully entered 'e2e-tests' directory."
+              echo "🔍 Listing contents inside 'e2e-tests':"
+              ls -lah
+          
+              if [ -d "playwright-report" ]; then
+                echo "✅ Playwright report directory found!"
+                echo "🔍 Listing contents of 'playwright-report':"
+                ls -lah playwright-report
+              else
+                echo "❌ Playwright report directory NOT found!"
+              fi
+            else
+              echo "❌ 'e2e-tests' directory NOT found inside 'rhdh'!"
+            fi
+          else
+            echo "❌ 'rhdh' directory NOT found in current path!"
+          fi    
+
+  upload-logs-and-report:
+    name: Upload Logs and Deploy Report
+    runs-on: ubuntu-latest
+    needs: run-smoke-tests
+    if: always()
+    steps:
+      - name: Download Playwright Report Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+      - name: Show current working directory and contents
+        run: |
+          echo "📂 Current working directory:"
+          pwd
+          echo "🔍 Listing contents of current directory:"
+          ls -lah
+
+      - name: Generate index.html for GitHub Pages
+        run: |
+          echo "<!DOCTYPE html>" > index.html
+          echo "<html lang='en'>" >> index.html
+          echo "<head><meta charset='UTF-8'><title>RHDH Plugin Certification</title></head>" >> index.html
+          echo "<body>" >> index.html
+          echo "<h1>RHDH Plugin Certification Pipeline</h1>" >> index.html
+          echo "<h2>Partner: ${{ needs.detect-changes.outputs.partner_name }}</h2>" >> index.html
+          echo "<h2>Plugin: ${{ needs.detect-changes.outputs.plugin_name }}</h2>" >> index.html
+          echo "<h2>Version: ${{ needs.detect-changes.outputs.version }}</h2>" >> index.html
+          echo "<p>This page is automatically generated by the RHDH Plugin Certification Pipeline.</p>" >> index.html
+          echo "</body></html>" >> playwright-report/index.html
+
+      # Deploy Playwright report to GitHub Pages
+      - name: Deploy Playwright Report to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.GH_PAT }}
+          publish_dir: playwright-report/
+          keep_files: true
+
+      # Print the Playwright Report URL
+      - name: Print Playwright Report Link
+        run: |
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO_NAME=$(basename "${{ github.repository }}")
+          echo "Playwright Report is available!"
+          echo "Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}"
+
+  cleanup:
+    name: Cleanup Deployment
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      # Ensure kubeconfig is set before running helm commands
+      - name: Set Up Kubeconfig
+        run: |
+          mkdir -p /opt/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > /opt/.kube/config
+          export KUBECONFIG=/opt/.kube/config
+          echo "KUBECONFIG=/opt/.kube/config" >> $GITHUB_ENV
+
+      # Ensure Helm release is removed before deploying a new one
+      - name: Uninstall Helm Release if Exists
+        run: |
+          export KUBECONFIG=/opt/.kube/config
+          RELEASE_NAME=$(helm list -n rhdh-smoketest -q | grep "redhat-developer-hub" || true)
+
+          if [ -n "$RELEASE_NAME" ]; then
+            echo "Removing existing Helm release: $RELEASE_NAME"
+            helm uninstall "$RELEASE_NAME" --namespace rhdh-smoketest
+          else
+            echo "No existing Helm release found."
+          fi
