@@ -4,19 +4,38 @@
 
 ### 1. Submit Your Plugin for Certification
 
-1. Create a Certification Repository:
-
-    * Fork the Certification Repository to your GitHub account.
-    * Clone the repository locally for changes.
+1. Fork the Certification Repository to your GitHub account.
     
-2. Prepare a Certification Pull Request (PR):
+2. Prepare a Certification Pull Request
 
-     *  Write a detailed description in your PR, including:
-        - Name: Plugin name
-        - Authors: <list of authors>
-        - OCI image: Image repository, name, and tag. Example, quay.io/example/image:v0.0.1
-            
-            Use supported packaging formats specified in the Plugin Packaging Documentation.
+   Create a directory under `partner` with the name of your organization. 
+   
+   Inside this directory, create a subdirectory with the name of your dynamic plugin. 
+   
+   Within this plugin directory, create another subdirectory using the version of the plugin as the directory name. 
+   
+   Finally, in this version directory, create a file called `package.yaml`.
+
+   In the `package.yaml` file, add the content for your dynamic plugin. Below is an example structure and content:
+
+   **Directory Structure:**
+   ```plaintext
+   partner/
+   └── your-organization
+       └── your-plugin
+           └── v1.0.0
+               └── package.yaml
+   ```
+    
+
+   **Example `package.yaml` Content:**
+   ```yaml
+   global:
+     dynamic:
+       plugins:
+         - package: oci://quay.io/tkral/backstage-community-plugin-todo:v0.1.1!backstage-community-plugin-todo
+           disabled: false
+
 
 3. Submit the PR:
 
