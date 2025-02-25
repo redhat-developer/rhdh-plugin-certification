@@ -1,5 +1,5 @@
 global:
-  #test test test
+  #test
     plugins:
       - package: ./dynamic-plugins/dist/backstage-community-plugin-quay
         disabled: false

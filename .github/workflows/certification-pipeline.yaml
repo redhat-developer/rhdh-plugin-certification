@@ -306,6 +306,17 @@ jobs:
           echo "🔍 Listing contents of current directory:"
           ls -lah
 
+      - name: Print plugin name and package.yaml path
+        if: success()
+        run: |
+          ls
+          pwd
+          echo "Plugin Name: ${{ needs.detect-changes.outputs.plugin_name }}" >> output.html
+          echo "Package.yaml Path: ${{ needs.detect-changes.outputs.package_yaml }}" >> output.html
+          echo "Version: ${{ needs.detect-changes.outputs.version }}" >> output.html
+          ls
+          cat output.html
+          
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
