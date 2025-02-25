@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>README Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <div id="content"></div>
+
+  <script>
+    fetch('README.md')
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('content').innerHTML = marked.parse(text);
+      })
+      .catch(error => {
+        console.error('Error loading README.md:', error);
+        document.getElementById('content').innerText = 'Failed to load README.md';
+      });
+  </script>
+</body>
+</html>
