@@ -329,7 +329,7 @@ jobs:
           REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO_NAME=$(basename "${{ github.repository }}")
           echo "Playwright Report is available!"
-          echo "Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}"
+          echo "Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/playwright-report/"
 
   cleanup:
     name: Cleanup Deployment
