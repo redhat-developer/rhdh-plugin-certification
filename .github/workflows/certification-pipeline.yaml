@@ -314,13 +314,14 @@ jobs:
           pwd
           echo "🔍 Listing contents of current directory:"
           ls -lah
-          
+
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: playwright-report/
+          destination_dir: playwright-report 
           keep_files: true
 
       # Print the Playwright Report URL
