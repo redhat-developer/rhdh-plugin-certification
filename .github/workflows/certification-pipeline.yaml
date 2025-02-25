@@ -37,7 +37,6 @@ jobs:
           path: |
             partners/
             values.yaml
-            app-config-rhdh.yaml
             rhdh/
           retention-days: 7
 
@@ -116,13 +115,6 @@ jobs:
           echo "Checking Kubernetes cluster connection..."
           export KUBECONFIG=/opt/.kube/config
           kubectl cluster-info || { echo "ERROR: Kubernetes cluster is unreachable!"; exit 1; }
-      
-      # Install configmap for Red Hat Developer Hub
-      - name: Install ConfigMap for Red Hat Developer Hub
-        run: |
-          echo "Creating ConfigMap for Red Hat Developer Hub..."
-          kubectl apply -f app-config-rhdh.yaml -n rose-pipeline
-          echo "ConfigMap created successfully!"
 
       # Install Helm and update repositories
       - name: Set Up Helm

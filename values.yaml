@@ -5,7 +5,27 @@ global:
       enabled: true
   clusterRouterBase: apps.dancurran-lab2025.opdev.io
   dynamic:
-    plugins: []
+    plugins:
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-security-insights
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd
+      - disabled: false
+        package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-ocm
+      - disabled: false
+        package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-ocm-backend-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-scaffolder-backend-module-utils-dynamic
     includes:
       - dynamic-plugins.default.yaml
 nameOverride: developer-hub
@@ -23,9 +43,11 @@ upstream:
     appConfig:
       app:
         baseUrl: https://{{- include "janus-idp.hostname" . }}
-      extraAppConfig:
-      - configMapRef: app-config-rhdh
-        filename: app-config-rhdh.yaml
+      auth:
+        environment: development
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true
       backend:
         auth:
           externalAccess:
