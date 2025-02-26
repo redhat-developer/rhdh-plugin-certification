@@ -36,6 +36,7 @@ jobs:
           name: repo-artifact
           path: |
             partners/
+            rhdh-helm-values.yaml
             values.yaml
             rhdh/
           retention-days: 7
@@ -145,7 +146,7 @@ jobs:
           fi
 
           ls 
-          
+
           # Proceed with installation
           helm repo add openshift-helm-charts https://charts.openshift.io/
           helm repo update
