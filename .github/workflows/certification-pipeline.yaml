@@ -144,11 +144,13 @@ jobs:
             echo "No existing Helm release found. Proceeding with installation."
           fi
 
+          ls 
+          
           # Proceed with installation
           helm repo add openshift-helm-charts https://charts.openshift.io/
           helm repo update
           helm install \
-            -f rhdh-plugin-certification/rhdh-helm-values.yaml \
+            -f rhdh-helm-values.yaml \
             redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
             --namespace rose-pipeline --create-namespace
 
