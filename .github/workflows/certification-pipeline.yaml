@@ -355,7 +355,7 @@ jobs:
 
           if [ -n "$RELEASE_NAME" ]; then
             echo "Removing existing Helm release: $RELEASE_NAME"
-            helm uninstall "$RELEASE_NAME" --namespace rose-pipeline
+            # helm uninstall "$RELEASE_NAME" --namespace rose-pipeline
           else
             echo "No existing Helm release found."
           fi
