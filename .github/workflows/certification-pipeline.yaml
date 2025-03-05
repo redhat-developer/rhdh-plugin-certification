@@ -60,19 +60,19 @@ jobs:
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           done
 
-  initialize-plugin-metadata:
-    name: Initialize and upload Plugin Metadata
+  Append-plugin-metadata:
+    name: Append and upload Plugin Metadata
     runs-on: ubuntu-latest
     needs: detect-changes
     steps:
-      - name: Generate HTML Output
+      - name: Append to HTML Output
         run: |
           PUBLISHER_NAME="${{ needs.detect-changes.outputs.publisher_name }}"
           PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
           PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
           VERSION="${{ needs.detect-changes.outputs.version }}"
           
-          cat <<EOF > output.html
+          cat <<EOF >> output.html
           Publisher Name: $PUBLISHER_NAME</p>
           Version: $VERSION</p>
           Plugin Name: $PLUGIN_NAME</p>
