@@ -73,30 +73,10 @@ jobs:
           VERSION="${{ needs.detect-changes.outputs.version }}"
           
           cat <<EOF > output.html
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Plugin Metadata</title>
-              <style>
-                  body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; background-color: #f4f4f4; }
-                  .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
-                  h1 { font-size: 24px; color: #333; }
-                  p { font-size: 18px; color: #555; margin: 5px 0; }
-                  .highlight { font-weight: bold; color: #d9534f; }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <h1>Plugin Metadata</h1>
-                  <p><span class="highlight">Publisher Name:</span> $PUBLISHER_NAME</p>
-                  <p><span class="highlight">Plugin Name:</span> $PLUGIN_NAME</p>
-                  <p><span class="highlight">Package.yaml Path:</span> $PACKAGE_YAML</p>
-                  <p><span class="highlight">Version:</span> $VERSION</p>
-              </div>
-          </body>
-          </html>
+          Publisher Name: $PUBLISHER_NAME</p>
+          Version: $VERSION</p>
+          Plugin Name: $PLUGIN_NAME</p>
+          Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
           EOF
           
       - name: Upload Plugin Metadata
