@@ -1,5 +1,5 @@
 global:
-  #testing changes partners to publishers -debug
+  #testing testing
     plugins:
       - package: ./dynamic-plugins/dist/backstage-community-plugin-quay
         disabled: false
