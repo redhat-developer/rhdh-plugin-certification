@@ -3,9 +3,9 @@ name: RHDH Plugin Certification Pipeline
 on:
   push:
     branches:
-      - main
+      - rose-branch
     paths:
-      - 'partners/**/package.yaml'
+      - 'publishers/**/package.yaml'
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
-          files: partners/**/package.yaml
+          files: publishers/**/package.yaml
 
       # Save repository as an artifact for later jobs
       - name: Save Repository as Artifact
@@ -35,7 +35,7 @@ jobs:
         with:
           name: repo-artifact
           path: |
-            partners/
+            publishers/
             values.yaml
             rhdh/
           retention-days: 7
@@ -316,7 +316,7 @@ jobs:
           echo "Version: ${{ needs.detect-changes.outputs.version }}" >> output.html
           ls
           cat output.html
-          
+
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
