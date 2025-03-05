@@ -312,9 +312,9 @@ jobs:
           ls
           pwd
           
-          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
-          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
-          VERSION="${{ needs.detect-changes.outputs.version }}"
+          PLUGIN_NAME="${{ needs.run-smoke-tests.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.run-smoke-tests.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.run-smoke-tests.detect-changes.outputs.version }}"
           
           # Append to output.html
           echo "Plugin Name: $PLUGIN_NAME" >> output.html
