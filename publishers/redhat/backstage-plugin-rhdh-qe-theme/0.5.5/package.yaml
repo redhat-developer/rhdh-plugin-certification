@@ -1,4 +1,5 @@
 global:
+  #test
   dynamic:
     plugins:
       - package: '@pataknight/backstage-plugin-rhdh-qe-theme@0.5.5'
