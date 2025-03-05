@@ -72,18 +72,18 @@ jobs:
           PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
           VERSION="${{ needs.detect-changes.outputs.version }}"
           
-          cat <<EOF >> output.html
-          Publisher Name: $PUBLISHER_NAME</p>
-          Version: $VERSION</p>
-          Plugin Name: $PLUGIN_NAME</p>
-          Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
+          cat <<EOF > new_output.html
+          <p>Publisher Name: $PUBLISHER_NAME</p>
+          <p>Version: $VERSION</p>
+          <p>Plugin Name: $PLUGIN_NAME</p>
+          <p>Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
           EOF
           
       - name: Upload Plugin Metadata
         uses: actions/upload-artifact@v4
         with:
           name: plugin-metadata
-          path: output.html
+          path: new_output.html
         
   setup-and-deploy:
     name: Setup and Deploy - ${{ needs.detect-changes.outputs.plugin_name }}
@@ -327,6 +327,13 @@ jobs:
     needs: run-smoke-tests
     if: always()
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages  # Fetch the current GitHub Pages branch
+          sparse-checkout: output.html
+          sparse-checkout-cone-mode: false
+
       - name: Download Playwright Report Artifact
         uses: actions/download-artifact@v4
         with:
@@ -338,6 +345,17 @@ jobs:
         with:
           name: plugin-metadata
           path: ./
+
+      - name: Merge new_output.html with Existing File
+        run: |
+          # Ensure output.html exists in the repository
+          if [ -f output.html ]; then
+            echo "<hr>" >> output.html  # Add a separator for clarity
+            cat new_output.html >> output.html  # Append new content
+            rm new_output.html  # Remove the temporary file
+          else
+            mv new_output.html output.html  # If not exists, use new one
+          fi
 
       # Deploy Playwright report to GitHub Pages
       - name: Deploy ./ to GitHub Pages
