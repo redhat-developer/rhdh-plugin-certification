@@ -61,7 +61,31 @@ jobs:
           done
           echo "Contents of GITHUB_OUTPUT:"
           cat $GITHUB_OUTPUT
-
+  init-plugin-metadata:
+    name: Initialize and upload Plugin Metadata
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    steps:
+      - name: Initialize Plugin Metadata
+        run: |
+          PUBLISHER_NAME="${{ needs.detect-changes.outputs.publisher_name }}"
+          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.detect-changes.outputs.version }}"
+          
+          # Append to output.html
+          echo "publisher_name: $PUBLISHER_NAME" >> output.html
+          echo "Plugin Name: $PLUGIN_NAME" >> output.html
+          echo "Package.yaml Path: $PACKAGE_YAML" >> output.html
+          echo "Version: $VERSION" >> output.html
+          ls
+          cat output.html
+      - name: Upload Plugin Metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-metadata
+          path: output.html
+        
   setup-and-deploy:
     name: Setup and Deploy - ${{ needs.detect-changes.outputs.plugin_name }}
     runs-on: ubuntu-latest
@@ -310,32 +334,14 @@ jobs:
           name: playwright-report
           path: playwright-report/
 
-      - name: Show current working directory and contents
-        run: |
-          echo "📂 Current working directory:"
-          pwd
-          echo "🔍 Listing contents of current directory:"
-          ls -lah
-
-      - name: Print plugin name and package.yaml path
-        if: success()
-        run: |
-          ls
-          pwd
-          
-          PLUGIN_NAME="${{ needs.run-smoke-tests.needs.detect-changes.outputs.plugin_name }}"
-          PACKAGE_YAML="${{ needs.run-smoke-tests.needs.detect-changes.outputs.package_yaml }}"
-          VERSION="${{ needs.run-smoke-tests.needs.detect-changes.outputs.version }}"
-          
-          # Append to output.html
-          echo "Plugin Name: $PLUGIN_NAME" >> output.html
-          echo "Package.yaml Path: $PACKAGE_YAML" >> output.html
-          echo "Version: $VERSION" >> output.html
-          ls
-          cat output.html
+      - name: Download plugin metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-metadata
+          path: ./
 
       # Deploy Playwright report to GitHub Pages
-      - name: Deploy Playwright Report to GitHub Pages
+      - name: Deploy ./ to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
@@ -349,6 +355,7 @@ jobs:
           REPO_NAME=$(basename "${{ github.repository }}")
           echo "Playwright Report is available!"
           echo "Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/playwright-report/"
+          echo "output.html URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/output.html"
 
   cleanup:
     name: Cleanup Deployment
