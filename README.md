@@ -1,4 +1,4 @@
-## Workflow for Certifying Your Plugin with Red Hat Developer Hub
+## Certifying Your Plugin with Red Hat Developer Hub
 
 This document outlines the steps required to certify your plugin with Red Hat Developer Hub. Follow these instructions to ensure a smooth and successful certification process.
 
