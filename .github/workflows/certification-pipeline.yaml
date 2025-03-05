@@ -101,7 +101,7 @@ jobs:
           sudo chmod 777 /opt/.kube
 
           echo "Writing Kubeconfig file..."
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d | sudo tee /opt/.kube/config > /dev/null
+          echo "${{ secrets.ROSE_KUBE_CONFIG }}" | base64 -d | sudo tee /opt/.kube/config > /dev/null
 
           echo "Setting KUBECONFIG environment variable..."
           export KUBECONFIG=/opt/.kube/config
@@ -343,7 +343,7 @@ jobs:
       - name: Set Up Kubeconfig
         run: |
           mkdir -p /opt/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > /opt/.kube/config
+          echo "${{ secrets.ROSE_KUBE_CONFIG }}" | base64 -d > /opt/.kube/config
           export KUBECONFIG=/opt/.kube/config
           echo "KUBECONFIG=/opt/.kube/config" >> $GITHUB_ENV
 
