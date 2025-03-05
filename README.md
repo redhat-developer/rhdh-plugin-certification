@@ -4,11 +4,11 @@
 
 ### 1. Submit Your Plugin for Certification
 
-1. Fork the Certification Repository to your GitHub account.
+1. Fork the Certification [Repository](https://github.com/redhat-developer/rhdh-plugin-certification) to your GitHub account.
     
 2. Prepare a Certification Pull Request
 
-   Create a directory under `partner` with the name of your organization. 
+   Create a directory under `publishers` with the name of your organization. 
    
    Inside this directory, create a subdirectory with the name of your dynamic plugin. 
    
@@ -20,7 +20,7 @@
 
    **Directory Structure:**
    ```plaintext
-   partner/
+   publishers/
    └── your-organization
        └── your-plugin
            └── v1.0.0

@@ -7,58 +7,56 @@ body {
     color: #333;
 }
 
-/* Header Section */
+/* Header */
 header {
     background: #ee0000;
     color: white;
     text-align: center;
-    padding: 30px;
+    padding: 20px;
 }
 
 header h1 {
     margin: 0;
-    font-size: 2.5em;
-}
-
-header p {
-    font-size: 1.2em;
-    margin-top: 5px;
+    font-size: 2em;
 }
 
 .button {
     display: inline-block;
     background: white;
     color: #ee0000;
-    padding: 10px 20px;
+    padding: 10px 15px;
     text-decoration: none;
     font-weight: bold;
     border-radius: 5px;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .button:hover {
     background: #ddd;
 }
 
-/* Main Content Section */
-main {
-    max-width: 800px;
+/* Content Area */
+#content {
+    max-width: 900px;
     margin: 20px auto;
     padding: 20px;
     background: white;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
 }
 
-/* Styling for README Content */
-#content {
-    padding: 20px;
-    font-size: 18px;
-    line-height: 1.6;
-}
-
-#content h1, #content h2, #content h3 {
-    color: #d9534f;
+/* Ensure Markdown Text Wraps Correctly */
+#content pre {
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word;
+    overflow-x: auto; /* Allow horizontal scrolling if necessary */
+    background: #f8f8f8;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 /* Footer */
