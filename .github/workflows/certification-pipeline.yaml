@@ -311,11 +311,18 @@ jobs:
         run: |
           ls
           pwd
-          echo "Plugin Name: ${{ needs.detect-changes.outputs.plugin_name }}" >> output.html
-          echo "Package.yaml Path: ${{ needs.detect-changes.outputs.package_yaml }}" >> output.html
-          echo "Version: ${{ needs.detect-changes.outputs.version }}" >> output.html
+          
+          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.detect-changes.outputs.version }}"
+          
+          # Append to output.html
+          echo "Plugin Name: $PLUGIN_NAME" >> output.html
+          echo "Package.yaml Path: $PACKAGE_YAML" >> output.html
+          echo "Version: $VERSION" >> output.html
           ls
           cat output.html
+          mv output.html playwright-report/
 
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
