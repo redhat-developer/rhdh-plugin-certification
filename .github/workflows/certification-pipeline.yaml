@@ -14,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       modified_files: ${{ steps.changed-files.outputs.all_changed_files }}
+      publisher_name: ${{ steps.extract-plugin.outputs.publisher_name }}
       plugin_name: ${{ steps.extract-plugin.outputs.plugin_name }}
       package_yaml: ${{ steps.extract-plugin.outputs.package_yaml }}
+      version: ${{ steps.extract-plugin.outputs.version }}
     steps:
       # Checkout the repository
       - name: Checkout Repository
@@ -49,7 +51,7 @@ jobs:
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "Processing file: $file"
-            PARTNER_NAME=$(echo "$file" | cut -d'/' -f2)
+            publisher_name=$(echo "$file" | cut -d'/' -f2)
             PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
             VERSION=$(echo "$file" | cut -d'/' -f4)
             echo "PARTNER_NAME=$PARTNER_NAME" >> $GITHUB_OUTPUT
@@ -57,12 +59,20 @@ jobs:
             echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           done
+          echo "Contents of GITHUB_OUTPUT:"
+          cat $GITHUB_OUTPUT
 
   setup-and-deploy:
     name: Setup and Deploy - ${{ needs.detect-changes.outputs.plugin_name }}
     runs-on: ubuntu-latest
     needs: detect-changes
     steps:
+      - name: Print Outputs for Debugging
+        run: |
+          echo "PLUGIN_NAME=${{ needs.detect-changes.outputs.plugin_name }}"
+          echo "PACKAGE_YAML=${{ needs.detect-changes.outputs.package_yaml }}"
+          echo "VERSION=${{ needs.detect-changes.outputs.version }}"
+      
       # Download repository artifact
       - name: Download Repository Artifact
         uses: actions/download-artifact@v4
@@ -296,6 +306,16 @@ jobs:
     needs: run-smoke-tests
     if: always()
     steps:
+      - name: create a directory to deploy artifacts
+        run: |
+          mkdir -p deploy
+          echo "Created deploy directory"
+      
+      - name: Create output.html file
+
+
+        run: |
+          echo
       - name: Download Playwright Report Artifact
         uses: actions/download-artifact@v4
         with:
@@ -325,7 +345,9 @@ jobs:
           echo "Version: $VERSION" >> output.html
           ls
           cat output.html
-          mv output.html playwright-report/
+          mkdir -p deploy
+          cp output.html deploy/
+          cp playwright-report/
 
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
