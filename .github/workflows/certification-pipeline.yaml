@@ -51,10 +51,10 @@ jobs:
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "Processing file: $file"
-            publisher_name=$(echo "$file" | cut -d'/' -f2)
+            PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
             PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
             VERSION=$(echo "$file" | cut -d'/' -f4)
-            echo "PARTNER_NAME=$PARTNER_NAME" >> $GITHUB_OUTPUT
+            echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
             echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
             echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
@@ -69,6 +69,7 @@ jobs:
     steps:
       - name: Print Outputs for Debugging
         run: |
+          echo "PUBLISHER_NAME=${{ needs.detect-changes.outputs.publisher_name }}"
           echo "PLUGIN_NAME=${{ needs.detect-changes.outputs.plugin_name }}"
           echo "PACKAGE_YAML=${{ needs.detect-changes.outputs.package_yaml }}"
           echo "VERSION=${{ needs.detect-changes.outputs.version }}"
@@ -306,16 +307,6 @@ jobs:
     needs: run-smoke-tests
     if: always()
     steps:
-      - name: create a directory to deploy artifacts
-        run: |
-          mkdir -p deploy
-          echo "Created deploy directory"
-      
-      - name: Create output.html file
-
-
-        run: |
-          echo
       - name: Download Playwright Report Artifact
         uses: actions/download-artifact@v4
         with:
@@ -335,9 +326,9 @@ jobs:
           ls
           pwd
           
-          PLUGIN_NAME="${{ needs.run-smoke-tests.detect-changes.outputs.plugin_name }}"
-          PACKAGE_YAML="${{ needs.run-smoke-tests.detect-changes.outputs.package_yaml }}"
-          VERSION="${{ needs.run-smoke-tests.detect-changes.outputs.version }}"
+          PLUGIN_NAME="${{ needs.run-smoke-tests.needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.run-smoke-tests.needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.run-smoke-tests.needs.detect-changes.outputs.version }}"
           
           # Append to output.html
           echo "Plugin Name: $PLUGIN_NAME" >> output.html
@@ -345,17 +336,13 @@ jobs:
           echo "Version: $VERSION" >> output.html
           ls
           cat output.html
-          mkdir -p deploy
-          cp output.html deploy/
-          cp playwright-report/
 
       # Deploy Playwright report to GitHub Pages
       - name: Deploy Playwright Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: playwright-report/
-          destination_dir: playwright-report 
+          publish_dir: .
           keep_files: true
 
       # Print the Playwright Report URL
