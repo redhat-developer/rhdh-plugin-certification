@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>README Viewer</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RHDH Plugin Certification</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="content"></div>
+  <header>
+    <h1>🔧 RHDH Plugin Certification</h1>
+    <p>Effortless certification for your Backstage plugins.</p>
+    <a href="https://github.com/redhat-developer/rhdh-plugin-certification" class="button">🔗 View on GitHub</a>
+  </header>
+
+  <main>
+    <div id="content">
+      <p>Loading README...</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Maintained by <a href="https://github.com/redhat-developer">Red Hat Developer Team</a></p>
+  </footer>
 
   <script>
     fetch('README.md')
@@ -15,7 +32,7 @@
       })
       .catch(error => {
         console.error('Error loading README.md:', error);
-        document.getElementById('content').innerText = 'Failed to load README.md';
+        document.getElementById('content').innerHTML = '<p style="color: red; font-weight: bold;">Failed to load README.md</p>';
       });
   </script>
 </body>
