@@ -26,6 +26,6 @@ echo $GITHUB_OUTPUT
 
 helm list
 # Force fail by putting this beneath helm list
-oc login --token="${RHDH_PR_OS_CLUSTER_TOKEN}" --server="${RHDH_PR_OS_CLUSTER_URL}"
-oc whoami --show-server
+# oc login --token="${RHDH_PR_OS_CLUSTER_TOKEN}" --server="${RHDH_PR_OS_CLUSTER_URL}"
+# oc whoami --show-server
 
