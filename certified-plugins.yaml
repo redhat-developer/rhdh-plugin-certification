@@ -1,7 +1,7 @@
 certified:
-  - name: 
-    authors: 
-    owners: 
-    image_loc: 
-    plugin_version: 
+  - name: ToDo
+    authors: Daniel Curran
+    owners: dcurran90
+    image_loc: quay.io/tkral/backstage-community-plugin-todo
+    plugin_version: v0.1.1
     rhdh_version: 
