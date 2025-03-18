@@ -23,10 +23,12 @@ for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
 done
 
 echo $GITHUB_OUTPUT
-exit 1
+
+
+# Force fail by putting this beneath helm list
+oc login --token="${RHDH_PR_OS_CLUSTER_TOKEN}" --server="${RHDH_PR_OS_CLUSTER_URL}"
+oc whoami --show-server
 
 helm list
-# Force fail by putting this beneath helm list
-# oc login --token="${RHDH_PR_OS_CLUSTER_TOKEN}" --server="${RHDH_PR_OS_CLUSTER_URL}"
-# oc whoami --show-server
 
+exit 1
