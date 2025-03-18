@@ -23,6 +23,7 @@ for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
 done
 
 echo $GITHUB_OUTPUT
+exit 1
 
 helm list
 # Force fail by putting this beneath helm list
