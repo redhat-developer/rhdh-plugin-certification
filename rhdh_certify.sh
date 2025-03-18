@@ -16,6 +16,10 @@ export IMAGE_VERSION=`git log -p --pretty=format: -- certified-plugins.yaml | gr
 
 helm list
 
+
+helm repo add openshift-helm-charts https://charts.openshift.io/
+helm repo update
+
 helm install \
     -f rhdh-helm-values.yaml \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
