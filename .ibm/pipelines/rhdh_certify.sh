@@ -62,7 +62,7 @@ exit "${OVERALL_RESULT}"
 
 main
 
-
+handle_main() {
 
 timeout --foreground 5m bash <<-"EOF"
     while ! oc login "$OPENSHIFT_API" -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" --insecure-skip-tls-verify=true; do
@@ -101,3 +101,4 @@ echo "WAITING FOR REVIEW"
 
 sleep 300
 exit 1
+}
