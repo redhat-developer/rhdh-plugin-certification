@@ -52,9 +52,9 @@ helm install \
     --namespace rose-pipeline --create-namespace
 
 
-helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "${{ needs.detect-changes.outputs.package_yaml }}" \
-    redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
-    --namespace rose-pipeline
+# helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "${{ needs.detect-changes.outputs.package_yaml }}" \
+#     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
+#     --namespace rose-pipeline
 
 helm list
 
