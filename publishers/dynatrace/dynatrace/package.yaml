@@ -1,7 +1,7 @@
 global:
   dynamic:
     plugins:
-      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dynatracefrontend
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dql
         disabled: false
-      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0:dynatracebackend
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0!dql-backend
         disabled: false
