@@ -90,13 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     steps:
-      - name: Print Outputs for Debugging
-        run: |
-          echo "PUBLISHER_NAME=${{ needs.detect-changes.outputs.publisher_name }}"
-          echo "PLUGIN_NAME=${{ needs.detect-changes.outputs.plugin_name }}"
-          echo "PACKAGE_YAML=${{ needs.detect-changes.outputs.package_yaml }}"
-          echo "VERSION=${{ needs.detect-changes.outputs.version }}"
-      
+       
       # Download repository artifact
       - name: Download Repository Artifact
         uses: actions/download-artifact@v4
