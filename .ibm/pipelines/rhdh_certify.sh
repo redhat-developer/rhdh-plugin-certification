@@ -61,7 +61,7 @@ helm list
 echo "WAITING FOR REVIEW"
 
 sleep 300
-exit 1
+# exit 1
 }
 
 main() {
