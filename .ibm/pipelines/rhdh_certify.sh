@@ -43,6 +43,8 @@ export IMAGE_LOC=`git log -p --pretty=format: -- certified-plugins.yaml | grep '
 export IMAGE_VERSION=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep plugin_version | awk '{print $3}'`
 export PLUGIN_FILE=`git show --name-only --oneline HEAD | grep publishers`
 
+git show
+
 # Check if PLUGIN_FILE is empty or contains multiple files
 if [[ -z "$PLUGIN_FILE" ]]; then
     echo "PLUGIN_FILE is empty!"
