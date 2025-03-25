@@ -41,6 +41,19 @@ fi
 
 export IMAGE_LOC=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep image_loc | awk '{print $3}'`
 export IMAGE_VERSION=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep plugin_version | awk '{print $3}'`
+export PLUGIN_FILE=`git show --name-only --oneline HEAD | grep publishers`
+
+# Check if PLUGIN_FILE is empty or contains multiple files
+if [[ -z "$PLUGIN_FILE" ]]; then
+    echo "PLUGIN_FILE is empty!"
+    exit 1
+elif [[ $(echo "$PLUGIN_FILE" | wc -l) -ne 1 ]]; then
+    echo "PLUGIN_FILE contains multiple filenames:"
+    echo "$PLUGIN_FILE"
+    exit 1
+else
+    echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
+fi
 
 helm list
 helm repo add openshift-helm-charts https://charts.openshift.io/
@@ -49,19 +62,19 @@ helm repo update
 helm install \
     -f rhdh-helm-values.yaml \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
-    --namespace rose-pipeline --create-namespace
+    --namespace test-pipeline --create-namespace
 
 
-# helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "${{ needs.detect-changes.outputs.package_yaml }}" \
-#     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
-#     --namespace rose-pipeline
+helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "$PLUGIN_FILE" \
+    redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
+    --namespace rose-pipeline
 
 helm list
 
 echo "WAITING FOR REVIEW"
 
 sleep 300
-# exit 1
+exit 1
 }
 
 main() {
