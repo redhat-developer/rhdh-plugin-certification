@@ -3,7 +3,7 @@ name: RHDH Plugin Certification Pipeline
 on:
   push:
     branches:
-      - rose-branch
+      - main
     paths:
       - 'publishers/**/package.yaml'
   workflow_dispatch:
@@ -90,7 +90,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     steps:
-       
       # Download repository artifact
       - name: Download Repository Artifact
         uses: actions/download-artifact@v4
@@ -129,7 +128,7 @@ jobs:
           sudo chmod 777 /opt/.kube
 
           echo "Writing Kubeconfig file..."
-          echo "${{ secrets.ROSE_KUBE_CONFIG }}" | base64 -d | sudo tee /opt/.kube/config > /dev/null
+          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d | sudo tee /opt/.kube/config > /dev/null
 
           echo "Setting KUBECONFIG environment variable..."
           export KUBECONFIG=/opt/.kube/config
@@ -355,7 +354,7 @@ jobs:
           fi
 
       # Deploy Playwright report to GitHub Pages
-      - name: Deploy ./ to GitHub Pages
+      - name: Deploy Playwrite Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
