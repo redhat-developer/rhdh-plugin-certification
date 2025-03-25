@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'partners/**/package.yaml'
+      - 'publishers/**/package.yaml'
   workflow_dispatch:
 
 jobs:
@@ -14,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       modified_files: ${{ steps.changed-files.outputs.all_changed_files }}
+      publisher_name: ${{ steps.extract-plugin.outputs.publisher_name }}
       plugin_name: ${{ steps.extract-plugin.outputs.plugin_name }}
       package_yaml: ${{ steps.extract-plugin.outputs.package_yaml }}
+      version: ${{ steps.extract-plugin.outputs.version }}
     steps:
       # Checkout the repository
       - name: Checkout Repository
@@ -26,7 +28,7 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v41
         with:
-          files: partners/**/package.yaml
+          files: publishers/**/package.yaml
 
       # Save repository as an artifact for later jobs
       - name: Save Repository as Artifact
@@ -35,8 +37,7 @@ jobs:
         with:
           name: repo-artifact
           path: |
-            partners/
-            rhdh-helm-values.yaml
+            publishers/
             values.yaml
             rhdh/
           retention-days: 7
@@ -50,15 +51,40 @@ jobs:
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             echo "Processing file: $file"
-            PARTNER_NAME=$(echo "$file" | cut -d'/' -f2)
+            PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
             PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
             VERSION=$(echo "$file" | cut -d'/' -f4)
-            echo "PARTNER_NAME=$PARTNER_NAME" >> $GITHUB_OUTPUT
+            echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
             echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
             echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           done
 
+  Append-plugin-metadata:
+    name: Append and upload Plugin Metadata
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    steps:
+      - name: Append to HTML Output
+        run: |
+          PUBLISHER_NAME="${{ needs.detect-changes.outputs.publisher_name }}"
+          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.detect-changes.outputs.version }}"
+          
+          cat <<EOF > new_output.html
+          <p>Publisher Name: $PUBLISHER_NAME</p>
+          <p>Version: $VERSION</p>
+          <p>Plugin Name: $PLUGIN_NAME</p>
+          <p>Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
+          EOF
+          
+      - name: Upload Plugin Metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-metadata
+          path: new_output.html
+        
   setup-and-deploy:
     name: Setup and Deploy - ${{ needs.detect-changes.outputs.plugin_name }}
     runs-on: ubuntu-latest
@@ -297,37 +323,42 @@ jobs:
     needs: run-smoke-tests
     if: always()
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages  # Fetch the current GitHub Pages branch
+          sparse-checkout: output.html
+          sparse-checkout-cone-mode: false
+
       - name: Download Playwright Report Artifact
         uses: actions/download-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
 
-      - name: Show current working directory and contents
-        run: |
-          echo "📂 Current working directory:"
-          pwd
-          echo "🔍 Listing contents of current directory:"
-          ls -lah
+      - name: Download plugin metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-metadata
+          path: ./
 
-      - name: Print plugin name and package.yaml path
-        if: success()
+      - name: Merge new_output.html with Existing File
         run: |
-          ls
-          pwd
-          echo "Plugin Name: ${{ needs.detect-changes.outputs.plugin_name }}" >> output.html
-          echo "Package.yaml Path: ${{ needs.detect-changes.outputs.package_yaml }}" >> output.html
-          echo "Version: ${{ needs.detect-changes.outputs.version }}" >> output.html
-          ls
-          cat output.html
-          
+          # Ensure output.html exists in the repository
+          if [ -f output.html ]; then
+            echo "<hr>" >> output.html  # Add a separator for clarity
+            cat new_output.html >> output.html  # Append new content
+            rm new_output.html  # Remove the temporary file
+          else
+            mv new_output.html output.html  # If not exists, use new one
+          fi
+
       # Deploy Playwright report to GitHub Pages
-      - name: Deploy Playwright Report to GitHub Pages
+      - name: Deploy Playwrite Report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: playwright-report/
-          destination_dir: playwright-report 
+          publish_dir: .
           keep_files: true
 
       # Print the Playwright Report URL
@@ -337,6 +368,7 @@ jobs:
           REPO_NAME=$(basename "${{ github.repository }}")
           echo "Playwright Report is available!"
           echo "Report URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/playwright-report/"
+          echo "output.html URL: https://${REPO_OWNER}.github.io/${REPO_NAME}/output.html"
 
   cleanup:
     name: Cleanup Deployment
@@ -347,7 +379,7 @@ jobs:
       - name: Set Up Kubeconfig
         run: |
           mkdir -p /opt/.kube
-          echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > /opt/.kube/config
+          echo "${{ secrets.ROSE_KUBE_CONFIG }}" | base64 -d > /opt/.kube/config
           export KUBECONFIG=/opt/.kube/config
           echo "KUBECONFIG=/opt/.kube/config" >> $GITHUB_ENV
 
