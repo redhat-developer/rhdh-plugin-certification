@@ -57,7 +57,6 @@ else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
 
-helm list
 helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
 
@@ -66,10 +65,15 @@ helm install \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace test-pipeline --create-namespace
 
+echo "DAN post install"
+helm list
+
+echo "DAN starting upgrade"
 
 helm upgrade --reuse-values -f "$PLUGIN_FILE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace test-pipeline
+echo "DAN ending upgrade"
 
 helm list
 
