@@ -69,7 +69,7 @@ helm install \
 
 helm upgrade --reuse-values -f "$PLUGIN_FILE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
-    --namespace rose-pipeline
+    --namespace test-pipeline
 
 helm list
 
