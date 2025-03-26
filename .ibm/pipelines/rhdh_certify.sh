@@ -78,7 +78,7 @@ helm list --namespace test-pipeline
 
 echo "WAITING FOR REVIEW"
 
-sleep 300
+sleep 800
 exit 1
 }
 
