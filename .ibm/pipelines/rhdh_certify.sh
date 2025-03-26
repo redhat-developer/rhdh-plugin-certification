@@ -60,22 +60,21 @@ fi
 helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
 
+echo "DAN start install"
 helm install \
     -f rhdh-helm-values.yaml \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace test-pipeline --create-namespace
-
 echo "DAN post install"
-helm list
+helm list --namespace test-pipeline
 
 echo "DAN starting upgrade"
-
 helm upgrade --reuse-values -f "$PLUGIN_FILE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace test-pipeline
 echo "DAN ending upgrade"
 
-helm list
+helm list --namespace test-pipeline
 
 echo "WAITING FOR REVIEW"
 
