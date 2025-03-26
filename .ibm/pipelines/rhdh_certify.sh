@@ -67,7 +67,7 @@ helm install \
     --namespace test-pipeline --create-namespace
 
 
-helm --kubeconfig /opt/.kube/config upgrade --reuse-values -f "$PLUGIN_FILE" \
+helm upgrade --reuse-values -f "$PLUGIN_FILE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace rose-pipeline
 
