@@ -98,7 +98,7 @@ upstream:
     initContainers:
     - command:
       - ./install-dynamic-plugins.sh
-      - /opt/app-root/src/dynamic-plugins-root
+      - /dynamic-plugins-root
       env:
       - name: NPM_CONFIG_USERCONFIG
         value: /opt/app-root/src/.npmrc.dynamic-plugins
