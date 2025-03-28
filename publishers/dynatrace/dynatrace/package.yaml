@@ -5,6 +5,12 @@ global:
       - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dynatrace-backstage-plugin-dql
         disabled: false
         pluginConfig:
+          mountPoints:
+            - mountPoint: entity.page.monitoring/cards
+              importName: DynatraceTab
+              config:
+                layout:
+                  gridColumn: "1 / -1"
           dynatrace:
             environments:
               - name: test
