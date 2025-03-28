@@ -2,7 +2,7 @@ global:
   #test test
   dynamic:
     plugins:
-      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dynatrace-backstage-plugin-dql
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dynatrace-dql
         disabled: false
         pluginConfig:
           mountPoints:
@@ -20,5 +20,5 @@ global:
                 clientId: test
                 clientSecret: test
 
-      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0!dynatrace-backstage-plugin-dql-backend-dynamic
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0!plugin.dynatrace-dql.service
         disabled: false
