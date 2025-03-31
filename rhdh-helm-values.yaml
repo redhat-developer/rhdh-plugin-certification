@@ -50,9 +50,9 @@ upstream:
         type: RuntimeDefault
       allowPrivilegeEscalation: false
       runAsNonRoot: true
-    extraAppConfig:
-      - configMapRef: app-config-rhdh
-        filename: app-config-rhdh.yaml
+    # extraAppConfig:
+    #   - configMapRef: app-config-rhdh
+    #     filename: app-config-rhdh.yaml
     extraEnvVars:
       - name: BACKEND_SECRET
         valueFrom:
@@ -67,10 +67,10 @@ upstream:
     extraVolumeMounts:
       - mountPath: /opt/app-root/src/dynamic-plugins-root
         name: dynamic-plugins-root
-    extraVolumes:
-      - name: dynamic-plugins-root
-        persistentVolumeClaim:
-          claimName: '{{ printf "%s-dynamic-plugins-root" .Release.Name }}'
+    # extraVolumes:
+    #   - name: dynamic-plugins-root
+    #     persistentVolumeClaim:
+    #       claimName: '{{ printf "%s-dynamic-plugins-root" .Release.Name }}'
       - configMap:
           defaultMode: 420
           name: '{{ printf "%s-dynamic-plugins" .Release.Name }}'
