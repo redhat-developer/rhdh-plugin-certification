@@ -194,6 +194,14 @@ jobs:
             redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
             --namespace rose-pipeline
 
+      # Verify pod status is running before proceeding
+      - name: Verify Pod Status
+        run: |
+          export KUBECONFIG=/opt/.kube/config
+          kubectl get pods -n rose-pipeline
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=developer-hub -n rose-pipeline --timeout=-1s
+
+  # Run Smoke Tests  
   run-smoke-tests:
     name: Run Smoke Tests
     runs-on: ubuntu-latest
@@ -255,6 +263,7 @@ jobs:
         working-directory: rhdh/e2e-tests
         run: |
           yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
+      
       # ✅ Upload Playwright Report inside the same job
       - name: Upload Playwright Report
         if: always()
@@ -342,12 +351,14 @@ jobs:
           path: playwright-report/
 
       - name: Download plugin metadata
+        if: success()
         uses: actions/download-artifact@v4
         with:
           name: plugin-metadata
           path: ./
 
       - name: Merge new_output.html with Existing File
+        if: success()
         run: |
           # Ensure output.html exists in the repository
           if [ -f output.html ]; then
