@@ -366,6 +366,10 @@ jobs:
           path: playwright-report/
 
       - name: Download plugin metadata
+        run: |
+          echo "playwright_success=${{ needs.run-smoke-tests.outputs.playwright_success }}"
+        
+      - name: Download plugin metadata
         if: ${{ needs.run-smoke-tests.outputs.playwright_success == 'true' }}
         uses: actions/download-artifact@v4
         with:
