@@ -184,7 +184,7 @@ jobs:
         run: |
           export KUBECONFIG=/opt/.kube/config
           kubectl get pods -n rose-pipeline
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=developer-hub -n rose-pipeline --timeout=-1s
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=developer-hub -n rose-pipeline --timeout=5m
 
       # Install dynamic plugin if there are changes
       - name: Install Dynamic Plugin
@@ -199,7 +199,7 @@ jobs:
         run: |
           export KUBECONFIG=/opt/.kube/config
           kubectl get pods -n rose-pipeline
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=developer-hub -n rose-pipeline --timeout=-1s
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/name=developer-hub -n rose-pipeline --timeout=5m
 
   # Run Smoke Tests  
   run-smoke-tests:
