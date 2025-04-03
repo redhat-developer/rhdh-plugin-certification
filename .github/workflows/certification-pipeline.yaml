@@ -207,7 +207,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup-and-deploy
     env:
-      BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.dancurran-lab2025.opdev.io/
+      BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.dcurran-lab2025.opdev.io/
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

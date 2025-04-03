@@ -2,7 +2,7 @@ global:
   auth:
     backend:
       enabled: true
-  clusterRouterBase: apps.dancurran-lab2025.opdev.io
+  clusterRouterBase: apps.dcurran-lab2025.opdev.io
   dynamic:
     plugins:
       - disabled: false
@@ -11,7 +11,7 @@ global:
       - dynamic-plugins.default.yaml
 route:
   enabled: true
-  host: '{{ .Values.global.host }}'
+  host: "{{ .Values.global.host }}"
   path: /
   tls:
     enabled: true
@@ -27,7 +27,7 @@ upstream:
         auth:
           externalAccess:
             - options:
-                secret: '${BACKEND_SECRET}'
+                secret: "${BACKEND_SECRET}"
                 subject: legacy-default-config
               type: legacy
         baseUrl: 'https://{{- include "janus-idp.hostname" . }}'
@@ -35,10 +35,10 @@ upstream:
           origin: 'https://{{- include "janus-idp.hostname" . }}'
         database:
           connection:
-            password: '${POSTGRESQL_ADMIN_PASSWORD}'
+            password: "${POSTGRESQL_ADMIN_PASSWORD}"
             user: postgres
     args:
-      - '--config'
+      - "--config"
       - dynamic-plugins-root/app-config.dynamic-plugins.yaml
     containerPorts:
       backend: 7007
@@ -187,7 +187,7 @@ upstream:
     enabled: false
   ingress:
     enabled: false
-    host: '{{ .Values.global.host }}'
+    host: "{{ .Values.global.host }}"
     path: /
     tls:
       enabled: false
