@@ -268,10 +268,10 @@ jobs:
           yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
           if [ $? -eq 0 ]; then
             echo "✅ Playwright test passed!"
-            echo "playwright_success=true" >> $GITHUB_ENV
+            echo "playwright_success=true" >> $GITHUB_OUTPUT
           else
             echo "❌ Playwright test failed!"
-            echo "playwright_success=false" >> $GITHUB_ENV
+            echo "playwright_success=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Set Playwright Test Result
@@ -365,10 +365,11 @@ jobs:
           name: playwright-report
           path: playwright-report/
 
-      - name: Download plugin metadata
+      - name: Print smoke test result
         run: |
-          echo "playwright_success=${{ needs.run-smoke-tests.outputs.playwright_success }}"
-        
+          echo "Playwright test result:"
+          echo "Playwright test success: ${{ needs.run-smoke-tests.outputs.playwright_success }}"
+          
       - name: Download plugin metadata
         if: ${{ needs.run-smoke-tests.outputs.playwright_success == 'true' }}
         uses: actions/download-artifact@v4
