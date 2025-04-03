@@ -205,6 +205,8 @@ jobs:
   run-smoke-tests:
     name: Run Smoke Tests
     runs-on: ubuntu-latest
+    outputs:
+      playwright_success: ${{ steps.set-playwright-result.outputs.playwright_success }}
     needs: setup-and-deploy
     env:
       BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.dcurran-lab2025.opdev.io/
@@ -260,9 +262,22 @@ jobs:
           yarn playwright install chromium
 
       - name: Run Playwright Smoke Test
+        id: playwright-test
         working-directory: rhdh/e2e-tests
         run: |
           yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
+          if [ $? -eq 0 ]; then
+            echo "✅ Playwright test passed!"
+            echo "playwright_success=true" >> $GITHUB_ENV
+          else
+            echo "❌ Playwright test failed!"
+            echo "playwright_success=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set Playwright Test Result
+        id: set-playwright-result
+        run: |
+          echo "playwright_success=${{ steps.playwright-test.outputs.playwright_success }}" >> $GITHUB_OUTPUT
       
       # ✅ Upload Playwright Report inside the same job
       - name: Upload Playwright Report
@@ -351,14 +366,14 @@ jobs:
           path: playwright-report/
 
       - name: Download plugin metadata
-        if: success()
+        if: ${{ needs.run-smoke-tests.outputs.playwright_success == 'true' }}
         uses: actions/download-artifact@v4
         with:
           name: plugin-metadata
           path: ./
 
       - name: Merge new_output.html with Existing File
-        if: success()
+        if: ${{ needs.run-smoke-tests.outputs.playwright_success == 'true' }}
         run: |
           # Ensure output.html exists in the repository
           if [ -f output.html ]; then
