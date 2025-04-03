@@ -8,6 +8,9 @@ on:
       - 'publishers/**/package.yaml'
   workflow_dispatch:
 
+env:
+  BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.insight-demo.runk8s.com/
+
 jobs:
   detect-changes:
     name: Detect PR Changes
@@ -209,7 +212,8 @@ jobs:
       playwright_success: ${{ steps.set-playwright-result.outputs.playwright_success }}
     needs: setup-and-deploy
     env:
-      BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.dcurran-lab2025.opdev.io/
+      #BASE_URL: https://redhat-developer-hub-rose-pipeline.apps.dcurran-lab2025.opdev.io/
+      BASE_URL: $BASE_URL
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
