@@ -4,5 +4,16 @@ global:
     plugins:
       - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql:pr_791__2.2.0!dynatrace-backstage-plugin-dql
         disabled: false
-      # - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0!dynatrace-backstage-plugin-dql-backend
-      #   disabled: false
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql-backend:pr_791__2.2.0!dynatrace-backstage-plugin-dql-backend-dynamic
+        disabled: false
+upstream:
+  backstage:
+    appConfig:
+      dynatrace:
+        environments:
+          - name: TEST
+            url: https://test.apps.dynatrace.com
+            tokenUrl: https://sso.dynatrace.com/sso/oauth2/token
+            accountUrn: testURN
+            clientId: testID
+            clientSecret: testSecret

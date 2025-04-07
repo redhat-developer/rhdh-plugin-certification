@@ -3,7 +3,7 @@ global:
   auth:
     backend:
       enabled: true
-  clusterRouterBase: apps.dancurran-lab2025.opdev.io
+  # clusterRouterBase: apps.dcurran-lab2025.opdev.io
   dynamic:
     plugins: []
     includes:
