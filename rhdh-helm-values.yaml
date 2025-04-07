@@ -51,8 +51,8 @@ upstream:
       allowPrivilegeEscalation: false
       runAsNonRoot: true
     extraAppConfig:
-      - configMapRef: app-config-rhdh
-        filename: app-config-rhdh.yaml
+      - configMapRef: redhat-developer-hub-app-config
+        filename: app-config.yaml
     extraEnvVars:
       - name: BACKEND_SECRET
         valueFrom:
