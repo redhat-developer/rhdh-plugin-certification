@@ -18,6 +18,7 @@ trap cleanup EXIT INT ERR
 
 SCRIPTS=(
     "env_variables.sh"
+    "smoke_test.sh"
     "utils.sh"
 )
 
@@ -75,6 +76,8 @@ helm upgrade --reuse-values -f "$PLUGIN_FILE" \
 echo "Upgrade Complete"
 
 helm list --namespace test-pipeline
+
+smoke_test
 
 echo "WAITING FOR REVIEW"
 
