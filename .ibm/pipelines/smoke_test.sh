@@ -1,10 +1,12 @@
 
-test_helm() {
+helm_test_until_success() {
   local release_name=$1
   local namespace=$2
   local helm_test_status=1
   local start_time=$(date +%s)
   local timeout=300  # 5 minutes in seconds
+
+  echo "Waiting for helm test to succeed"
 
   if [ -z "$release_name" ]; then
     echo "Error: Helm release name is required."
@@ -19,6 +21,8 @@ test_helm() {
     if [ $helm_test_status -eq 0 ]; then
       echo "Helm test passed for $release_name!"
       return 0
+    else
+      echo "Continuing to wait"
     fi
 
     local current_time=$(date +%s)
@@ -141,4 +145,4 @@ smoke_test() {
 }
 
 # smoke_test
-# test_helm
+# helm_test_until_success redhat-developer-hub test-pipeline-dan
