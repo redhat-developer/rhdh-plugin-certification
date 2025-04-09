@@ -69,6 +69,8 @@ helm install \
 echo "Post helm install"
 helm list --namespace test-pipeline
 
+run_helm_test_until_success redhat-developer-hub test-pipeline
+
 echo "Starting Upgrade"
 helm upgrade --reuse-values -f "$PLUGIN_FILE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
@@ -76,6 +78,7 @@ helm upgrade --reuse-values -f "$PLUGIN_FILE" \
 echo "Upgrade Complete"
 
 helm list --namespace test-pipeline
+run_helm_test_until_success redhat-developer-hub test-pipeline
 
 smoke_test
 
@@ -90,22 +93,6 @@ main() {
   echo "JOB_NAME : $JOB_NAME"
 
   case "$JOB_NAME" in
-    *aks*)
-      echo "Calling handle_aks"
-      handle_aks
-      ;;
-    *gke*)
-      echo "Calling handle_gke"
-      handle_gke
-      ;;
-    *operator*)
-      echo "Calling Operator"
-      handle_operator
-      ;;
-    *periodic*)
-      echo "Calling handle_periodic"
-      handle_nightly
-      ;;
     *pull*)
       echo "Calling handle_main"
       handle_main
@@ -116,5 +103,42 @@ echo "Main script completed with result: ${OVERALL_RESULT}"
 exit "${OVERALL_RESULT}"
 
 }
+
+
+run_helm_test_until_success() {
+  local release_name=$1
+  local namespace=$2
+  local helm_test_status=1
+  local start_time=$(date +%s)
+  local timeout=300  # 5 minutes in seconds
+
+  if [ -z "$release_name" ]; then
+    echo "Error: Helm release name is required."
+    return 1
+  fi
+
+  while [ $helm_test_status -ne 0 ]; do
+    echo "Running helm test for release: $release_name"
+    helm test "$release_name" --namespace "$namespace"
+    helm_test_status=$?
+
+    if [ $helm_test_status -eq 0 ]; then
+      echo "Helm test passed for $release_name!"
+      return 0
+    fi
+
+    local current_time=$(date +%s)
+    local elapsed=$((current_time - start_time))
+
+    if [ $elapsed -ge $timeout ]; then
+      echo "Timeout of 5 minutes reached for $release_name. Exiting with status $helm_test_status."
+      return $helm_test_status
+    fi
+
+    echo "Helm test failed with status $helm_test_status. Retrying in 10 seconds..."
+    sleep 10
+  done
+}
+
 
 main
