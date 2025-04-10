@@ -69,7 +69,7 @@ helm install \
 echo "Post helm install"
 helm list --namespace test-pipeline
 
-run_helm_test_until_success redhat-developer-hub test-pipeline
+helm_test_until_success redhat-developer-hub test-pipeline
 
 echo "Starting Upgrade"
 helm upgrade --reuse-values -f "$PLUGIN_FILE" \
@@ -78,7 +78,7 @@ helm upgrade --reuse-values -f "$PLUGIN_FILE" \
 echo "Upgrade Complete"
 
 helm list --namespace test-pipeline
-run_helm_test_until_success redhat-developer-hub test-pipeline
+helm_test_until_success redhat-developer-hub test-pipeline
 
 smoke_test
 
