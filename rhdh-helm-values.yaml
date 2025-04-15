@@ -2,7 +2,7 @@ global:
   auth:
     backend:
       enabled: true
-  # clusterRouterBase: '{{- include "janus-idp.hostname" . }}'
+  clusterRouterBase: 'test.example.com'
   dynamic:
     plugins:
       - disabled: false
