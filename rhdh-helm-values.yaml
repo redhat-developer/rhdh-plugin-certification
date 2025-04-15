@@ -2,7 +2,7 @@ global:
   auth:
     backend:
       enabled: true
-  # clusterRouterBase: apps.dcurran-lab2025.opdev.io
+  # clusterRouterBase: '{{- include "janus-idp.hostname" . }}'
   dynamic:
     plugins:
       - disabled: false
@@ -11,7 +11,7 @@ global:
       - dynamic-plugins.default.yaml
 route:
   enabled: true
-  host: '{{ .Values.global.host }}'
+  # host: '{{- include "janus-idp.hostname" . }}'
   path: /
   tls:
     enabled: true

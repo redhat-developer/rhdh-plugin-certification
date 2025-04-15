@@ -39,9 +39,6 @@ helm_test_until_success() {
 }
 
 smoke_test() {
-
-    echo "DAN"
-
     # Ensure RHDH Repository Exists
     if [ ! -d "rhdh" ]; then
         echo "RHDH repository not found. Cloning..."
