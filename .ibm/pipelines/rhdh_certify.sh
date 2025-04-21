@@ -30,6 +30,23 @@ done
 
 handle_main() {
 
+# handle_main() {
+#   echo "Configuring namespace: ${NAME_SPACE}"
+#   oc_login
+#   echo "OCP version: $(oc version)"
+
+#   export K8S_CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
+#   cluster_setup
+#   initiate_deployments
+#   deploy_test_backstage_provider "${NAME_SPACE}"
+#   local url="https://${RELEASE_NAME}-backstage-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
+#   check_and_test "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
+#   local rbac_url="https://${RELEASE_NAME_RBAC}-backstage-${NAME_SPACE_RBAC}.${K8S_CLUSTER_ROUTER_BASE}"
+#   check_and_test "${RELEASE_NAME_RBAC}" "${NAME_SPACE_RBAC}" "${rbac_url}"
+# }
+
+
+
 timeout --foreground 5m bash <<-"EOF"
     while ! oc login "$OPENSHIFT_API" -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" --insecure-skip-tls-verify=true; do
             sleep 20
@@ -62,8 +79,11 @@ helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
 
 echo "Starting helm install"
+# BASE_URL=`oc get dns cluster -o jsonpath='{.spec.baseDomain}'`
+export K8S_CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
 helm install \
     -f rhdh-helm-values.yaml \
+    --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
     redhat-developer-hub openshift-helm-charts/redhat-developer-hub \
     --namespace test-pipeline --create-namespace
 echo "Post helm install"
@@ -104,7 +124,5 @@ exit "${OVERALL_RESULT}"
 
 }
 
-
-
-
+# Call the main function to start the script
 main
