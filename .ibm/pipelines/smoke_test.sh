@@ -72,6 +72,49 @@ smoke_test() {
 
     yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
 
+
+    # Check if the Playwright report directory exists
+    if [ -d "rhdh/e2e-tests/playwright-report" ]; then
+        echo "Playwright report directory exists."
+
+    else
+        echo "Playwright report directory is missing!"
+        exit 1
+    fi
+
+
+
+
+    # Config
+    REPO="your-username/your-repo"   # Update this or use: gh repo view --json nameWithOwner
+    TAG="v1.0.0"                     # You can make this dynamic
+    REPORT_DIR="rhdh/e2e-tests/playwright-report"
+    ZIP_FILE="playwright-report.zip"
+
+    # Ensure the report exists
+    if [ ! -d "$REPORT_DIR" ]; then
+      echo "❌ Report directory '$REPORT_DIR' not found."
+      exit 1
+    fi
+
+    # Zip the report
+    echo "📦 Zipping report..."
+    zip -r "$ZIP_FILE" "$REPORT_DIR"
+
+    # Check if release exists
+    if ! gh release view "$TAG" --repo "$REPO" &> /dev/null; then
+      echo "🔖 Creating release $TAG..."
+      gh release create "$TAG" --repo "$REPO" --title "Test Report $TAG" --notes "Automated Playwright report upload"
+    else
+      echo "📄 Release $TAG already exists."
+    fi
+
+    # Upload to release
+    echo "📤 Uploading report..."
+    gh release upload "$TAG" "$ZIP_FILE" --repo "$REPO" --clobber
+
+    echo "✅ Report uploaded: https://github.com/$REPO/releases/tag/$TAG"
+
     # ✅ Upload Playwright Report inside the same job
     # - name: Upload Playwright Report
     #   if: always()
@@ -83,54 +126,6 @@ smoke_test() {
     #     if-no-files-found: warn
     #     include-hidden-files: true
 
-    # Verify Playwright Report Before Upload
-
-    # echo "🔍 Checking if Playwright report directory exists..."
-    # if [ -d "rhdh/e2e-tests/playwright-report" ]; then
-    #   echo "✅ Playwright report directory found!"
-    #   echo "🔍 Listing contents:"
-    #   ls -lah rhdh/e2e-tests/playwright-report
-    # else
-    #   echo "❌ ERROR: Playwright report directory NOT found!"
-    # fi
-
-    # Show current working directory and contents
-    # echo "📂 Current working directory:"
-    # pwd
-    # echo "🔍 Listing contents of current directory:"
-    # ls -lah
-
-    # Show one level up directory
-    # echo "🔍 Listing contents of parent directory:"
-    # ls -lah ..
-
-    # Attempt to find Playwright Report
-    # echo "🔍 Trying to locate 'rhdh' directory and navigate into it..."
-    # if [ -d "rhdh" ]; then
-    #   cd rhdh
-    #   echo "✅ Successfully entered 'rhdh' directory."
-    #   echo "🔍 Listing contents inside 'rhdh':"
-    #   ls -lah
-    
-    #   if [ -d "e2e-tests" ]; then
-    #     cd e2e-tests
-    #     echo "✅ Successfully entered 'e2e-tests' directory."
-    #     echo "🔍 Listing contents inside 'e2e-tests':"
-    #     ls -lah
-    
-    #     if [ -d "playwright-report" ]; then
-    #       echo "✅ Playwright report directory found!"
-    #       echo "🔍 Listing contents of 'playwright-report':"
-    #       ls -lah playwright-report
-    #     else
-    #       echo "❌ Playwright report directory NOT found!"
-    #     fi
-    #   else
-    #     echo "❌ 'e2e-tests' directory NOT found inside 'rhdh'!"
-    #   fi
-    # else
-    #   echo "❌ 'rhdh' directory NOT found in current path!"
-    # fi    
 }
 
 # smoke_test

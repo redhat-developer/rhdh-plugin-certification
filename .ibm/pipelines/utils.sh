@@ -626,6 +626,7 @@ create_app_config_map_k8s() {
 }
 
 run_tests() {
+  echo "Dan1"
   local release_name=$1
   local project=$2
   cd "${DIR}/../../e2e-tests"
@@ -633,6 +634,7 @@ run_tests() {
   e2e_tests_dir=$(pwd)
 
   yarn install --immutable > /tmp/yarn.install.log.txt 2>&1
+  echo "Dan2"
 
   INSTALL_STATUS=$?
   if [ $INSTALL_STATUS -ne 0 ]; then
@@ -643,6 +645,7 @@ run_tests() {
     echo "Yarn install completed successfully."
   fi
 
+  echo "Dan3"
   yarn playwright install chromium
 
   Xvfb :99 &

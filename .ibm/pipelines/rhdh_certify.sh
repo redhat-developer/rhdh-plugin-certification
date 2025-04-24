@@ -100,11 +100,11 @@ local url="https://${DEPLOYMENT_NAME}-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
 echo "$url"
 check_upgrade_and_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
 smoke_test
+run_tests "${DEPLOYMENT_NAME}" "${NAME_SPACE}"
 
 echo "WAITING FOR REVIEW"
-
 sleep 1200
-exit 1
+
 }
 
 main() {
