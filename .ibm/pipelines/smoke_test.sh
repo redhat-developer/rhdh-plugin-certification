@@ -114,19 +114,4 @@ smoke_test() {
     gh release upload "$TAG" "$ZIP_FILE" --repo "$REPO" --clobber
 
     echo "✅ Report uploaded: https://github.com/$REPO/releases/tag/$TAG"
-
-    # ✅ Upload Playwright Report inside the same job
-    # - name: Upload Playwright Report
-    #   if: always()
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: playwright-report
-    #     path: rhdh/e2e-tests/playwright-report/
-    #     retention-days: 7
-    #     if-no-files-found: warn
-    #     include-hidden-files: true
-
 }
-
-# smoke_test
-# helm_test_until_success redhat-developer-hub test-pipeline-dan
