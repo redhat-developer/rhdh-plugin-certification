@@ -678,6 +678,8 @@ run_tests() {
   cp -a "/tmp/${LOGFILE}.html" "${ARTIFACT_DIR}/${project}"
   cp -a "${e2e_tests_dir}/playwright-report/"* "${ARTIFACT_DIR}/${project}"
 
+  cp -a "rhdh/e2e-tests/playwright-report/"* "${ARTIFACT_DIR}/${project}/playwright-report"
+
   droute_send "${release_name}" "${project}"
 
   echo "${project} RESULT: ${RESULT}"

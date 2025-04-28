@@ -80,6 +80,13 @@ helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
 
 echo "Starting helm install"
+
+echo "helm install \
+    -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
+    --set global.clusterRouterBase=${K8S_CLUSTER_ROUTER_BASE} \
+    ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
+    --namespace ${NAME_SPACE} --create-namespace"
+
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
     --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
