@@ -42,21 +42,13 @@ done
 
 handle_main() {
 
+cluster_login
+
 export NAME_SPACE="test-pipeline"
 export DEPLOYMENT_NAME="redhat-developer-hub"
 export HELM_CHART_VALUE_FILE_NAME_BASE="rhdh-helm-values.yaml"
 export K8S_CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
 
-
-# handle_main() {
-#   cluster_setup
-#   initiate_deployments
-#   deploy_test_backstage_provider "${NAME_SPACE}"
-#   local url="https://${DEPLOYMENT_NAME}-backstage-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
-#   check_and_test "${DEPLOYMENT_NAME}" "${NAME_SPACE}" "${url}"
-# }
-
-cluster_login
 
 export IMAGE_LOC=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep image_loc | awk '{print $3}'`
 export IMAGE_VERSION=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep plugin_version | awk '{print $3}'`
