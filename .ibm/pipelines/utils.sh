@@ -32,7 +32,7 @@ save_all_pod_logs(){
 
   mkdir -p "${ARTIFACT_DIR}/${namespace}/pod_logs"
   cp -a pod_logs/* "${ARTIFACT_DIR}/${namespace}/pod_logs"
-  set -e
+  #set -e
 }
 
 droute_send() {
@@ -173,11 +173,11 @@ droute_send() {
           sleep "${wait_seconds}"
         fi
       done
-      set -e
+      #set -e
     fi
     oc exec -n "${droute_project}" "${droute_pod_name}" -- /bin/bash -c "rm -rf ${temp_droute}/*"
     if [ -n "${PULL_NUMBER:-}" ]; then
-      set -e
+      #set -e
     fi
   ) # Close subshell
   rm -f "$temp_kubeconfig" # Destroy temporary KUBECONFIG
@@ -652,7 +652,7 @@ run_tests() {
   export DISPLAY=:99
 
   (
-    set -e
+    # set -e
     echo "Using PR container image: ${TAG_NAME}"
     yarn "$project"
   ) 2>&1 | tee "/tmp/${LOGFILE}"

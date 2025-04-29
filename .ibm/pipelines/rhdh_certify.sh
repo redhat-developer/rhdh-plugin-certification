@@ -44,6 +44,8 @@ handle_main() {
 
 cluster_login
 
+export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 export NAME_SPACE="test-pipeline"
 export DEPLOYMENT_NAME="redhat-developer-hub"
 export HELM_CHART_VALUE_FILE_NAME_BASE="rhdh-helm-values.yaml"
