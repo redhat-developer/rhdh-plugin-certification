@@ -34,6 +34,12 @@ SCRIPTS=(
     "utils.sh"
 )
 
+
+
+echo "DAN1"
+dan_test
+exit 1
+
 # Source each script dynamically
 for SCRIPT in "${SCRIPTS[@]}"; do
     source "${DIR}/${SCRIPT}"
@@ -75,12 +81,6 @@ helm repo update
 
 echo "Starting helm install"
 
-echo "helm install \
-    -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
-    --set global.clusterRouterBase=${K8S_CLUSTER_ROUTER_BASE} \
-    ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
-    --namespace ${NAME_SPACE} --create-namespace"
-
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
     --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
@@ -100,8 +100,8 @@ local url="https://${DEPLOYMENT_NAME}-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
 
 echo "$url"
 check_upgrade_and_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
-run_tests "${DEPLOYMENT_NAME}" "${NAME_SPACE}"
 smoke_test
+run_tests "${DEPLOYMENT_NAME}" "${NAME_SPACE}"
 
 
 echo "WAITING FOR REVIEW"
