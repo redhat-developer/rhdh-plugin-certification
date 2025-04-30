@@ -40,6 +40,7 @@ helm_test_until_success() {
 
 smoke_test() {
     # Ensure RHDH Repository Exists
+    
     if [ ! -d "rhdh" ]; then
         echo "RHDH repository not found. Cloning..."
         git clone https://github.com/redhat-developer/rhdh.git
@@ -57,6 +58,8 @@ smoke_test() {
 
     # Install Dependencies
     cd rhdh
+    local HOME=/tmp
+    yarn config set cacheFolder /tmp/.yarn-cache
     yarn install
 
     # name: Install Playwright Dependencies

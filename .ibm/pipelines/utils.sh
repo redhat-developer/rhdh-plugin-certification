@@ -634,7 +634,6 @@ run_tests() {
   e2e_tests_dir=$(pwd)
 
   yarn install --immutable > /tmp/yarn.install.log.txt 2>&1
-  echo "Dan2"
 
   INSTALL_STATUS=$?
   if [ $INSTALL_STATUS -ne 0 ]; then
@@ -645,7 +644,6 @@ run_tests() {
     echo "Yarn install completed successfully."
   fi
 
-  echo "Dan3"
   yarn playwright install chromium
 
   Xvfb :99 &
