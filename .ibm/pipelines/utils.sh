@@ -633,6 +633,8 @@ run_tests() {
   local e2e_tests_dir
   e2e_tests_dir=$(pwd)
 
+  local HOME="/tmp"
+  yarn config set cacheFolder /tmp/.yarn-cache
   yarn install --immutable > /tmp/yarn.install.log.txt 2>&1
 
   INSTALL_STATUS=$?
