@@ -34,12 +34,6 @@ SCRIPTS=(
     "utils.sh"
 )
 
-
-
-echo "DAN1"
-dan_test
-exit 1
-
 # Source each script dynamically
 for SCRIPT in "${SCRIPTS[@]}"; do
     source "${DIR}/${SCRIPT}"
