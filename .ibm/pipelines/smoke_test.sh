@@ -77,7 +77,7 @@ smoke_test() {
 
 
     # Check if the Playwright report directory exists
-    if [ -d "rhdh/e2e-tests/playwright-report" ]; then
+    if [ -d "e2e-tests/playwright-report" ]; then
         echo "Playwright report directory exists."
 
     else
