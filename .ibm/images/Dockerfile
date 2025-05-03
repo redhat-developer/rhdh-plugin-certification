@@ -18,7 +18,9 @@ ENV CI=1 \
 # Install essential dependencies and Node.js tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     make gcc g++ python3 rsync sshpass \
-    nodejs \
+    nodejs gh \
+    # delete this 
+    vim \
     openssl libssl-dev ca-certificates \
     curl wget jq colorized-logs && \
     npm install -g typescript yarn@latest && \

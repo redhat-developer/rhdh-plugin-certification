@@ -91,7 +91,7 @@ smoke_test() {
     # Config
     REPO="your-username/your-repo"   # Update this or use: gh repo view --json nameWithOwner
     TAG="v1.0.0"                     # You can make this dynamic
-    REPORT_DIR="rhdh/e2e-tests/playwright-report"
+    REPORT_DIR="playwright-report"
     ZIP_FILE="playwright-report.zip"
 
     # Ensure the report exists
