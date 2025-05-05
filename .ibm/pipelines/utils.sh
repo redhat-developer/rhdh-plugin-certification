@@ -626,10 +626,16 @@ create_app_config_map_k8s() {
 }
 
 run_tests() {
-  echo "Dan1"
   local release_name=$1
   local project=$2
-  cd "${DIR}/../../e2e-tests"
+  cd "${DIR}"
+  if [ ! -d "rhdh" ]; then
+      echo "RHDH repository not found. Cloning..."
+      git clone https://github.com/redhat-developer/rhdh.git
+  else
+      echo "RHDH repository already exists."
+  fi
+  cd "rhdh/e2e-tests"
   local e2e_tests_dir
   e2e_tests_dir=$(pwd)
 

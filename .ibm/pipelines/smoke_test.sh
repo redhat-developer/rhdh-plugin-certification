@@ -61,34 +61,17 @@ smoke_test() {
     local HOME=/tmp
     yarn config set cacheFolder /tmp/.yarn-cache
     yarn install
-
-    # name: Install Playwright Dependencies
     cd e2e-tests
 
     echo "INSTALL CHROMIUM"
     yarn playwright install chromium
 
-    # name: Run Playwright Smoke Test
-        
     # working-directory: rhdh/e2e-tests
     echo "RUN PLAYWRIGHT TEST"
 
     yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
 
-
-    # Check if the Playwright report directory exists
-    if [ -d "e2e-tests/playwright-report" ]; then
-        echo "Playwright report directory exists."
-
-    else
-        echo "Playwright report directory is missing!"
-        # exit 1
-    fi
-
-
-
-
-    # Config
+    # Upload Playwright Report
     REPO="your-username/your-repo"   # Update this or use: gh repo view --json nameWithOwner
     TAG="v1.0.0"                     # You can make this dynamic
     REPORT_DIR="playwright-report"
@@ -97,24 +80,11 @@ smoke_test() {
     # Ensure the report exists
     if [ ! -d "$REPORT_DIR" ]; then
       echo "❌ Report directory '$REPORT_DIR' not found."
-      # exit 1
     fi
+
+    cp -a "playwright-report/"* "${ARTIFACT_DIR}/${project}/playwright-report"
 
     # Zip the report
     echo "📦 Zipping report..."
     zip -r "$ZIP_FILE" "$REPORT_DIR"
-
-    # Check if release exists
-    if ! gh release view "$TAG" --repo "$REPO" &> /dev/null; then
-      echo "🔖 Creating release $TAG..."
-      gh release create "$TAG" --repo "$REPO" --title "Test Report $TAG" --notes "Automated Playwright report upload"
-    else
-      echo "📄 Release $TAG already exists."
-    fi
-
-    # Upload to release
-    echo "📤 Uploading report..."
-    gh release upload "$TAG" "$ZIP_FILE" --repo "$REPO" --clobber
-
-    echo "✅ Report uploaded: https://github.com/$REPO/releases/tag/$TAG"
 }

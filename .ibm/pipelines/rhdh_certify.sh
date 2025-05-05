@@ -45,7 +45,6 @@ handle_main() {
 cluster_login
 
 export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
 export NAME_SPACE="test-pipeline"
 export DEPLOYMENT_NAME="redhat-developer-hub"
 export HELM_CHART_VALUE_FILE_NAME_BASE="rhdh-helm-values.yaml"
@@ -67,9 +66,6 @@ elif [[ $(echo "$PLUGIN_FILE" | wc -l) -ne 1 ]]; then
 else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
-
-
-
 
 helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
