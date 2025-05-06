@@ -94,7 +94,7 @@ echo "$url"
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
 
 echo "WAITING FOR REVIEW"
-sleep 1200
+sleep 3000
 }
 
 main() {
