@@ -39,8 +39,14 @@ helm_test_until_success() {
 }
 
 smoke_test() {
-    # Ensure RHDH Repository Exists
+    set -e
+    local deployment_name="$1"
+    local release_name="$2"
+    local namespace="$3"
+    local BASE_URL=$4
+    local timeout=${5:-600} # Timeout in seconds (default: 600 seconds)
     
+    # Ensure RHDH Repository Exists
     if [ ! -d "rhdh" ]; then
         echo "RHDH repository not found. Cloning..."
         git clone https://github.com/redhat-developer/rhdh.git
@@ -71,20 +77,14 @@ smoke_test() {
 
     yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
 
-    # Upload Playwright Report
-    REPO="your-username/your-repo"   # Update this or use: gh repo view --json nameWithOwner
-    TAG="v1.0.0"                     # You can make this dynamic
-    REPORT_DIR="playwright-report"
-    ZIP_FILE="playwright-report.zip"
-
     # Ensure the report exists
     if [ ! -d "$REPORT_DIR" ]; then
+      pwd
       echo "❌ Report directory '$REPORT_DIR' not found."
     fi
 
-    cp -a "playwright-report/"* "${ARTIFACT_DIR}/playwright-report"
-
+    cp -r "$REPORT_DIR/" "${ARTIFACT_DIR}/"
     # Zip the report
-    echo "📦 Zipping report..."
-    zip -r "$ZIP_FILE" "$REPORT_DIR"
+    # echo "📦 Zipping report..."
+    # zip -r "$ZIP_FILE" "$REPORT_DIR"
 }
