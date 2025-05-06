@@ -82,7 +82,7 @@ smoke_test() {
       echo "❌ Report directory '$REPORT_DIR' not found."
     fi
 
-    cp -a "playwright-report/"* "${ARTIFACT_DIR}/${project}/playwright-report"
+    cp -a "playwright-report/"* "${ARTIFACT_DIR}/playwright-report"
 
     # Zip the report
     echo "📦 Zipping report..."
