@@ -30,45 +30,27 @@ jobs:
         with:
           files: publishers/**/package.yaml
 
-      # Extract plugin name and package.yaml path
       - name: Extract Plugin Name and Package.yaml Path
         id: extract-plugin
         run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "Processing file: $file"
-            PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
-            PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
-            VERSION=$(echo "$file" | cut -d'/' -f4)
+          file="${{ steps.changed-files.outputs.all_changed_files }}"
 
-            yq e '.global.dynamic.plugins[].package' $file | while read -r package; do
-              IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
-              PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
+          echo "Processing file: $file"
+          echo "publisher_name=$(echo "$file" | cut -d'/' -f2)" >> $GITHUB_OUTPUT
+          echo "plugin_name=$(echo "$file" | cut -d'/' -f3)" >> $GITHUB_OUTPUT
+          echo "package_yaml=$file" >> $GITHUB_OUTPUT
+          echo "version=$(echo "$file" | cut -d'/' -f4)" >> $GITHUB_OUTPUT
 
-              echo "IMAGE_LOC=$IMAGE_LOC" >> $GITHUB_OUTPUT
-              echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
-            done
-
-            
-            echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
-            echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
-            echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
-            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          done
+          package=$(yq e '.global.dynamic.plugins[0].package' "$file")
+          echo "image_loc=$(echo "$package" | cut -d':' -f1)" >> $GITHUB_OUTPUT
+          echo "plugin_version=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)" >> $GITHUB_OUTPUT
 
       - name: Append plugin entry if not present
         run: |
-          # Set variables
           FILE=certified-plugins.yaml
           OWNERS="${OWNERS:-${GITHUB_ACTOR}}"
 
-          AUTHORS="${{ needs.detect-changes.outputs.publisher_name }}"
-          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
-          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
-          VERSION="${{ needs.detect-changes.outputs.plugin_version }}"
-          IMAGE="${{ needs.detect-changes.outputs.image_loc }}"
-
-
-          # Check for existing plugin by name and image
+          echo "Checking for existing plugin entry..."
           exists=$(yq e ".certified[] | select(.name == \"$PLUGIN_NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
 
           if [ -z "$exists" ]; then
@@ -88,11 +70,79 @@ jobs:
             echo "Plugin already exists. Skipping append."
           fi
         env:
-          PLUGIN_NAME: ${{ env.PLUGIN_NAME }}
-          AUTHORS: ${{ env.PUBLISHER_NAME }}
+          PLUGIN_NAME: ${{ steps.extract-plugin.outputs.plugin_name }}
+          AUTHORS: ${{ steps.extract-plugin.outputs.publisher_name }}
           OWNERS: dcurran90
-          IMAGE: ${{ env.PACKAGE_YAML }}
-          VERSION: ${{ env.VERSION }}
+          IMAGE: ${{ steps.extract-plugin.outputs.image_loc }}
+          VERSION: ${{ steps.extract-plugin.outputs.plugin_version }}
+
+
+
+
+
+      # # Extract plugin name and package.yaml path
+      # - name: Extract Plugin Name and Package.yaml Path
+      #   id: extract-plugin
+      #   run: |
+      #     for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+      #       echo "Processing file: $file"
+      #       PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
+      #       PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
+      #       VERSION=$(echo "$file" | cut -d'/' -f4)
+
+      #       yq e '.global.dynamic.plugins[].package' $file | while read -r package; do
+      #         IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
+      #         PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
+
+      #         echo "IMAGE_LOC=$IMAGE_LOC" >> $GITHUB_OUTPUT
+      #         echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
+      #       done
+
+            
+      #       echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
+      #       echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
+      #       echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
+      #       echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+      #     done
+
+      # - name: Append plugin entry if not present
+      #   run: |
+      #     # Set variables
+      #     FILE=certified-plugins.yaml
+      #     OWNERS="${OWNERS:-${GITHUB_ACTOR}}"
+
+      #     AUTHORS="${{ needs.detect-changes.outputs.publisher_name }}"
+      #     PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+      #     PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+      #     VERSION="${{ needs.detect-changes.outputs.plugin_version }}"
+      #     IMAGE="${{ needs.detect-changes.outputs.image_loc }}"
+
+
+      #     # Check for existing plugin by name and image
+      #     exists=$(yq e ".certified[] | select(.name == \"$PLUGIN_NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
+
+      #     if [ -z "$exists" ]; then
+      #       echo "Appending new plugin entry..."
+
+      #       yq e -i '
+      #         .certified += [{
+      #           "name": env(PLUGIN_NAME),
+      #           "authors": env(AUTHORS),
+      #           "owners": env(OWNERS),
+      #           "image_loc": env(IMAGE),
+      #           "plugin_version": env(VERSION),
+      #           "rhdh_version": null
+      #         }]
+      #       ' "$FILE"
+      #     else
+      #       echo "Plugin already exists. Skipping append."
+      #     fi
+      #   env:
+      #     PLUGIN_NAME: ${{ env.PLUGIN_NAME }}
+      #     AUTHORS: ${{ env.PUBLISHER_NAME }}
+      #     OWNERS: dcurran90
+      #     IMAGE: ${{ env.PACKAGE_YAML }}
+      #     VERSION: ${{ env.VERSION }}
 
       - name: Append to HTML Output
         run: |
