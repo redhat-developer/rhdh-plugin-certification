@@ -69,7 +69,7 @@ jobs:
 
 
           # Check for existing plugin by name and image
-          exists=$(yq e ".certified[] | select(.name == \"$NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
+          exists=$(yq e ".certified[] | select(.name == \"$PLUGIN_NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
 
           if [ -z "$exists" ]; then
             echo "Appending new plugin entry..."
@@ -88,7 +88,7 @@ jobs:
             echo "Plugin already exists. Skipping append."
           fi
         env:
-          NAME: ${{ env.PLUGIN_NAME }}
+          PLUGIN_NAME: ${{ env.PLUGIN_NAME }}
           AUTHORS: ${{ env.PUBLISHER_NAME }}
           OWNERS: dcurran90
           IMAGE: ${{ env.PACKAGE_YAML }}
