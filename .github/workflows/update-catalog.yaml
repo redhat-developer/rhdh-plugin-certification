@@ -40,7 +40,7 @@ jobs:
             PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
             VERSION=$(echo "$file" | cut -d'/' -f4)
 
-            yq e '.global.dynamic.plugins[].package' file.yaml | while read -r package; do
+            yq e '.global.dynamic.plugins[].package' $file | while read -r package; do
               IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
               PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
 
