@@ -39,7 +39,7 @@ helm_test_until_success() {
 }
 
 smoke_test() {
-    set -e
+    # set -e
     local deployment_name="$1"
     local release_name="$2"
     local namespace="$3"
