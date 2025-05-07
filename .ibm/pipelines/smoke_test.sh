@@ -46,6 +46,8 @@ smoke_test() {
     local BASE_URL=$4
     local timeout=${5:-600} # Timeout in seconds (default: 600 seconds)
     
+    REPORT_DIR="playwright-report"
+
     # Ensure RHDH Repository Exists
     if [ ! -d "rhdh" ]; then
         echo "RHDH repository not found. Cloning..."
