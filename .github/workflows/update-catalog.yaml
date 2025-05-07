@@ -44,8 +44,8 @@ jobs:
               IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
               PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
 
-              echo "IMAGE_LOC=$IMAGE_LOC"
-              echo "PLUGIN_VERSION=$PLUGIN_VERSION"
+              echo "IMAGE_LOC=$IMAGE_LOC" >> $GITHUB_OUTPUT
+              echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
             done
 
             
@@ -54,16 +54,19 @@ jobs:
             echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           done
-          
+
       - name: Append plugin entry if not present
         run: |
           # Set variables
           FILE=certified-plugins.yaml
-          NAME="$PLUGIN_NAME"
-          AUTHORS="$PUBLISHER_NAME"
           OWNERS="${OWNERS:-${GITHUB_ACTOR}}"
-          IMAGE="$PACKAGE_YAML"
-          VERSION="$VERSION"
+
+          AUTHORS="${{ needs.detect-changes.outputs.publisher_name }}"
+          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.detect-changes.outputs.plugin_version }}"
+          IMAGE="${{ needs.detect-changes.outputs.image_loc }}"
+
 
           # Check for existing plugin by name and image
           exists=$(yq e ".certified[] | select(.name == \"$NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
@@ -73,7 +76,7 @@ jobs:
 
             yq e -i '
               .certified += [{
-                "name": env(NAME),
+                "name": env(PLUGIN_NAME),
                 "authors": env(AUTHORS),
                 "owners": env(OWNERS),
                 "image_loc": env(IMAGE),
