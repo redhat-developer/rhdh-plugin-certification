@@ -69,6 +69,9 @@ jobs:
           else
             echo "Plugin already exists. Skipping append."
           fi
+
+          echo "Test file Output"
+          cat $FILE 
         env:
           PLUGIN_NAME: ${{ steps.extract-plugin.outputs.plugin_name }}
           AUTHORS: ${{ steps.extract-plugin.outputs.publisher_name }}
