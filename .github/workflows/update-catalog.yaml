@@ -35,15 +35,20 @@ jobs:
         run: |
           file="${{ steps.changed-files.outputs.all_changed_files }}"
 
+
+          # Commited package string
+          package=$(yq e '.global.dynamic.plugins[0].package' "$file")
+          IMAGE_LOC="${package%:*}"
+          # PLUGIN_VERSION: everything after the last colon
+          PLUGIN_VERSION="${package##*:}"
+
           echo "Processing file: $file"
           echo "publisher_name=$(echo "$file" | cut -d'/' -f2)" >> $GITHUB_OUTPUT
           echo "plugin_name=$(echo "$file" | cut -d'/' -f3)" >> $GITHUB_OUTPUT
           echo "package_yaml=$file" >> $GITHUB_OUTPUT
           echo "version=$(echo "$file" | cut -d'/' -f4)" >> $GITHUB_OUTPUT
-
-          package=$(yq e '.global.dynamic.plugins[0].package' "$file")
-          echo "image_loc=$(echo "$package" | cut -d':' -f1)" >> $GITHUB_OUTPUT
-          echo "plugin_version=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)" >> $GITHUB_OUTPUT
+          echo "image_loc=$IMAGE_LOC" >> "$GITHUB_OUTPUT"
+          echo "plugin_version=$PLUGIN_VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Append plugin entry if not present
         run: |
