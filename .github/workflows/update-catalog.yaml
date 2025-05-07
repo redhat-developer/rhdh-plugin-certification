@@ -64,7 +64,7 @@ jobs:
       - name: Append plugin entry if not present
         run: |
           # Set variables
-          FILE=plugins.yaml
+          FILE=certified-plugins.yaml
           NAME="$PLUGIN_NAME"
           AUTHORS="$PUBLISHER_NAME"
           OWNERS="${OWNERS:-${GITHUB_ACTOR}}"
