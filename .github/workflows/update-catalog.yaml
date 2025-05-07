@@ -39,6 +39,16 @@ jobs:
             PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
             PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
             VERSION=$(echo "$file" | cut -d'/' -f4)
+
+            yq e '.global.dynamic.plugins[].package' file.yaml | while read -r package; do
+              IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
+              PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
+
+              echo "IMAGE_LOC=$IMAGE_LOC"
+              echo "PLUGIN_VERSION=$PLUGIN_VERSION"
+            done
+
+            
             echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
             echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
             echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
