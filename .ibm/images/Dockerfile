@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make gcc g++ python3 rsync sshpass \
     nodejs gh \
     # delete this 
-    vim \
+    vim tmux \
     openssl libssl-dev ca-certificates \
     curl wget jq colorized-logs && \
     npm install -g typescript yarn@latest && \

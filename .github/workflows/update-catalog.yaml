@@ -1,0 +1,88 @@
+name: RHDH Plugin Certification Pipeline
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'publishers/**/package.yaml'
+  workflow_dispatch:
+
+jobs:
+  detect-changes:
+    name: Detect PR Changes
+    runs-on: ubuntu-latest
+    outputs:
+      modified_files: ${{ steps.changed-files.outputs.all_changed_files }}
+      publisher_name: ${{ steps.extract-plugin.outputs.publisher_name }}
+      plugin_name: ${{ steps.extract-plugin.outputs.plugin_name }}
+      package_yaml: ${{ steps.extract-plugin.outputs.package_yaml }}
+      version: ${{ steps.extract-plugin.outputs.version }}
+    steps:
+      # Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Identify modified plugin files
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          files: publishers/**/package.yaml
+
+      # Save repository as an artifact for later jobs
+      - name: Save Repository as Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-artifact
+          path: |
+            publishers/
+            values.yaml
+            rhdh/
+          retention-days: 7
+
+      - name: Confirm Artifact Upload
+        run: echo "Artifact repo-artifact uploaded successfully!"
+
+      # Extract plugin name and package.yaml path
+      - name: Extract Plugin Name and Package.yaml Path
+        id: extract-plugin
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "Processing file: $file"
+            PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
+            PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
+            VERSION=$(echo "$file" | cut -d'/' -f4)
+            echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
+            echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
+            echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          done
+
+  Append-plugin-metadata:
+    name: Append and upload Plugin Metadata
+    runs-on: ubuntu-latest
+    needs: detect-changes
+    steps:
+      - name: Append to HTML Output
+        run: |
+          PUBLISHER_NAME="${{ needs.detect-changes.outputs.publisher_name }}"
+          PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
+          PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
+          VERSION="${{ needs.detect-changes.outputs.version }}"
+          
+          cat <<EOF > new_output.html
+          <p>Publisher Name: $PUBLISHER_NAME</p>
+          <p>Version: $VERSION</p>
+          <p>Plugin Name: $PLUGIN_NAME</p>
+          <p>Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
+          EOF
+          
+      - name: Upload Plugin Metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-metadata
+          path: new_output.html
+        
+ 
