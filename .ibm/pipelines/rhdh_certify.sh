@@ -80,10 +80,10 @@ helm install \
 
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 
-echo "Starting Upgrade"
-helm upgrade --reuse-values -f "$PLUGIN_FILE" \
-    ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
-    --namespace ${NAME_SPACE}
+# echo "Starting Upgrade"
+# helm upgrade --reuse-values -f "$PLUGIN_FILE" \
+#     ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
+#     --namespace ${NAME_SPACE}
 
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 

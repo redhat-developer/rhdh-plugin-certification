@@ -84,6 +84,7 @@ smoke_test() {
       echo "Current dir"
       pwd
       echo "contents"
+      ls
       ls "$REPORT_DIR"
       echo "❌ Report directory '$REPORT_DIR' not found."
     fi
