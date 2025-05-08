@@ -81,7 +81,10 @@ smoke_test() {
 
     # Ensure the report exists
     if [ ! -d "$REPORT_DIR" ]; then
+      echo "Current dir"
       pwd
+      echo "contents"
+      ls "$REPORT_DIR"
       echo "❌ Report directory '$REPORT_DIR' not found."
     fi
 
