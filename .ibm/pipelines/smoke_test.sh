@@ -66,10 +66,10 @@ smoke_test() {
 
     # Install Dependencies
     cd rhdh
+    cd e2e-tests
     local HOME=/tmp
     yarn config set cacheFolder /tmp/.yarn-cache
     yarn install
-    cd e2e-tests
 
     echo "INSTALL CHROMIUM"
     yarn playwright install chromium
