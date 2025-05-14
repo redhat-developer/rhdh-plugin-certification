@@ -1,0 +1,32 @@
+FROM ubuntu:latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # make gcc++ python3 rsync sshpass \
+    npm git vim tmux curl wget jq colorized-logs && \
+    npm install -g typescript yarn@latest
+
+# Install Helm, OpenShift CLI, ocm-cli, and yq
+RUN apt-get update && apt-get install -y curl gnupg2 tar jq && \
+    # Install Helm
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash && \
+    # Install OpenShift CLI (oc)
+    curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz && \
+    tar -xzf openshift-client-linux.tar.gz -C /usr/local/bin oc kubectl && \
+    rm openshift-client-linux.tar.gz && \
+    # Install yq (v4.x)
+    curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq && \
+    chmod +x /usr/local/bin/yq
+
+# Install skopeo
+RUN apt-get update -y && \
+    apt-get install -y skopeo
+
+# Install umoci
+RUN curl -LO "https://github.com/opencontainers/umoci/releases/download/v0.4.7/umoci.amd64" && \ 
+    chmod +x umoci.amd64 && \
+    mv umoci.amd64 /usr/local/bin/umoci
+
+# Install opm
+RUN curl -LO "https://github.com/operator-framework/operator-registry/releases/download/v1.23.0/linux-amd64-opm" && \ 
+    chmod +x linux-amd64-opm && \
+    mv linux-amd64-opm /usr/local/bin/opm

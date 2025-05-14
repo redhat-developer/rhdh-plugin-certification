@@ -65,8 +65,7 @@ smoke_test() {
     fi
 
     # Install Dependencies
-    cd rhdh
-    cd e2e-tests
+    cd rhdh/e2e-tests
     local HOME=/tmp
     yarn config set cacheFolder /tmp/.yarn-cache
     yarn install
@@ -90,7 +89,16 @@ smoke_test() {
     fi
 
     cp -r "$REPORT_DIR/" "${ARTIFACT_DIR}/"
-    # Zip the report
-    # echo "📦 Zipping report..."
-    # zip -r "$ZIP_FILE" "$REPORT_DIR"
+
+
+    JOB_BASE_URL="https://prow.ci.openshift.org/view/gs/test-platform-results"
+    if [ -n "${PULL_NUMBER:-}" ]; then
+      JOB_URL="${JOB_BASE_URL}/pr-logs/pull/${REPO_OWNER}_${REPO_NAME}/${PULL_NUMBER}/${JOB_NAME}/${BUILD_ID}"
+      ARTIFACTS_URL="https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/pr-logs/pull/${REPO_OWNER}_${REPO_NAME}/${PULL_NUMBER}/${JOB_NAME}/${BUILD_ID}/artifacts/e2e-tests/${REPO_OWNER}-${REPO_NAME}/artifacts/${project}"
+    else
+      JOB_URL="${JOB_BASE_URL}/logs/${JOB_NAME}/${BUILD_ID}"
+      ARTIFACTS_URL="https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/logs/${JOB_NAME}/${BUILD_ID}/artifacts/${JOB_NAME##periodic-ci-redhat-developer-rhdh-main-}/${REPO_OWNER}-${REPO_NAME}/artifacts/${project}"
+    fi
+
+    echo "ARTIFACTS_URL: $ARTIFACTS_URL"
 }

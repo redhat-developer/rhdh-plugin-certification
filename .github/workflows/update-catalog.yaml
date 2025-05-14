@@ -85,73 +85,6 @@ jobs:
           VERSION: ${{ steps.extract-plugin.outputs.plugin_version }}
 
 
-
-
-
-      # # Extract plugin name and package.yaml path
-      # - name: Extract Plugin Name and Package.yaml Path
-      #   id: extract-plugin
-      #   run: |
-      #     for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-      #       echo "Processing file: $file"
-      #       PUBLISHER_NAME=$(echo "$file" | cut -d'/' -f2)
-      #       PLUGIN_NAME=$(echo "$file" | cut -d'/' -f3)
-      #       VERSION=$(echo "$file" | cut -d'/' -f4)
-
-      #       yq e '.global.dynamic.plugins[].package' $file | while read -r package; do
-      #         IMAGE_LOC=$(echo "$package" | cut -d':' -f1)
-      #         PLUGIN_VERSION=$(echo "$package" | cut -d':' -f2 | cut -d'!' -f1)
-
-      #         echo "IMAGE_LOC=$IMAGE_LOC" >> $GITHUB_OUTPUT
-      #         echo "PLUGIN_VERSION=$PLUGIN_VERSION" >> $GITHUB_OUTPUT
-      #       done
-
-            
-      #       echo "PUBLISHER_NAME=$PUBLISHER_NAME" >> $GITHUB_OUTPUT
-      #       echo "PLUGIN_NAME=$PLUGIN_NAME" >> $GITHUB_OUTPUT
-      #       echo "PACKAGE_YAML=$file" >> $GITHUB_OUTPUT
-      #       echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-      #     done
-
-      # - name: Append plugin entry if not present
-      #   run: |
-      #     # Set variables
-      #     FILE=certified-plugins.yaml
-      #     OWNERS="${OWNERS:-${GITHUB_ACTOR}}"
-
-      #     AUTHORS="${{ needs.detect-changes.outputs.publisher_name }}"
-      #     PLUGIN_NAME="${{ needs.detect-changes.outputs.plugin_name }}"
-      #     PACKAGE_YAML="${{ needs.detect-changes.outputs.package_yaml }}"
-      #     VERSION="${{ needs.detect-changes.outputs.plugin_version }}"
-      #     IMAGE="${{ needs.detect-changes.outputs.image_loc }}"
-
-
-      #     # Check for existing plugin by name and image
-      #     exists=$(yq e ".certified[] | select(.name == \"$PLUGIN_NAME\" and .image_loc == \"$IMAGE\")" "$FILE")
-
-      #     if [ -z "$exists" ]; then
-      #       echo "Appending new plugin entry..."
-
-      #       yq e -i '
-      #         .certified += [{
-      #           "name": env(PLUGIN_NAME),
-      #           "authors": env(AUTHORS),
-      #           "owners": env(OWNERS),
-      #           "image_loc": env(IMAGE),
-      #           "plugin_version": env(VERSION),
-      #           "rhdh_version": null
-      #         }]
-      #       ' "$FILE"
-      #     else
-      #       echo "Plugin already exists. Skipping append."
-      #     fi
-      #   env:
-      #     PLUGIN_NAME: ${{ env.PLUGIN_NAME }}
-      #     AUTHORS: ${{ env.PUBLISHER_NAME }}
-      #     OWNERS: dcurran90
-      #     IMAGE: ${{ env.PACKAGE_YAML }}
-      #     VERSION: ${{ env.VERSION }}
-
       - name: Append to HTML Output
         run: |
           PUBLISHER_NAME="${{ needs.detect-changes.outputs.publisher_name }}"
@@ -165,7 +98,15 @@ jobs:
           <p>Plugin Name: $PLUGIN_NAME</p>
           <p>Package repo path: https://github.com/redhat-developer/rhdh-plugin-certification/blob/rose-branch/$PACKAGE_YAML</p>
           EOF
-          
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add new_output.html
+          git add certified-plugins.yaml
+          git commit -m "Post-merge catalog updates"
+          git push
+
       - name: Upload Plugin Metadata
         uses: actions/upload-artifact@v4
         with:
