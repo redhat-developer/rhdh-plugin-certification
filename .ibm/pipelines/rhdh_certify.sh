@@ -57,7 +57,8 @@ export PLUGIN_FILE=`git show --name-only --oneline HEAD | grep publishers`
 
 # Check if PLUGIN_FILE is empty or contains multiple files
 if [[ -z "$PLUGIN_FILE" ]]; then
-    echo "PLUGIN_FILE is empty!"
+    echo "Plugin file $PLUGIN_FILE is empty!"
+    git show
     exit 1
 elif [[ $(echo "$PLUGIN_FILE" | wc -l) -ne 1 ]]; then
     echo "PLUGIN_FILE contains multiple filenames:"
