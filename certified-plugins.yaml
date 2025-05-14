@@ -4,4 +4,10 @@ certified:
     owners: dcurran90
     image_loc: quay.io/tkral/backstage-community-plugin-todo
     plugin_version: v0.1.1
-    rhdh_version: 
+    rhdh_version:
+  - name: dynatrace
+    authors: dynatrace
+    owners: dcurran90
+    image_loc: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql
+    plugin_version: pr_791__2.2.0!dynatrace-backstage-plugin-dql
+    rhdh_version: null
