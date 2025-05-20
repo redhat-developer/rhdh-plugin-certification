@@ -73,6 +73,9 @@ helm repo update
 
 echo "Starting helm install"
 
+echo "WAITING FOR REVIEW"
+sleep infinity
+
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
     --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
@@ -94,8 +97,7 @@ echo "$url"
 
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
 
-echo "WAITING FOR REVIEW"
-sleep 10000
+
 }
 
 main() {
