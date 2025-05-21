@@ -74,7 +74,7 @@ helm repo update
 echo "Starting helm install"
 
 echo "WAITING FOR REVIEW"
-sleep infinity
+sleep 10000
 
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
