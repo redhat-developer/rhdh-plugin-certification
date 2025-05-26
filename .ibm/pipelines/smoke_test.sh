@@ -66,7 +66,6 @@ smoke_test() {
 
     # Install Dependencies
     cd rhdh/e2e-tests
-    local HOME=/tmp
     yarn config set cacheFolder /tmp/.yarn-cache
     yarn install
 

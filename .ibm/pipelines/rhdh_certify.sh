@@ -42,8 +42,7 @@ done
 
 handle_main() {
 
-cluster_login
-
+export HOME=/tmp
 export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export NAME_SPACE="test-pipeline"
 export DEPLOYMENT_NAME="redhat-developer-hub"
