@@ -72,9 +72,6 @@ helm repo update
 
 echo "Starting helm install"
 
-echo "WAITING FOR REVIEW"
-sleep 10000
-
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
     --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
@@ -83,10 +80,10 @@ helm install \
 
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 
-# echo "Starting Upgrade"
-# helm upgrade --reuse-values -f "$PLUGIN_FILE" \
-#     ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
-#     --namespace ${NAME_SPACE}
+echo "Starting Upgrade"
+helm upgrade --reuse-values -f "$PLUGIN_FILE" \
+    ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
+    --namespace ${NAME_SPACE}
 
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 
@@ -96,6 +93,8 @@ echo "$url"
 
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
 
+echo "WAITING FOR REVIEW"
+sleep 10000
 
 }
 
