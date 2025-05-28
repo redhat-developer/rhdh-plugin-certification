@@ -78,6 +78,8 @@ helm install \
     ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
     --namespace ${NAME_SPACE} --create-namespace
 
+echo "WAITING FOR REVIEW"
+sleep 10000
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 
 echo "Starting Upgrade"
@@ -93,8 +95,7 @@ echo "$url"
 
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
 
-echo "WAITING FOR REVIEW"
-sleep 10000
+
 
 }
 
