@@ -11,7 +11,7 @@ OVERALL_RESULT=0
 
 cluster_login() {
 timeout --foreground 5m bash <<-"EOF"
-    while ! oc login "$OPENSHIFT_API" -u "$OPENSHIFT_USERNAME" -p "$OPENSHIFT_PASSWORD" --insecure-skip-tls-verify=true; do
+    while ! oc login --insecure-skip-tls-verify=true; do
             sleep 20
     done
 EOF
@@ -66,6 +66,8 @@ elif [[ $(echo "$PLUGIN_FILE" | wc -l) -ne 1 ]]; then
 else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
+
+cluster_login
 
 helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
