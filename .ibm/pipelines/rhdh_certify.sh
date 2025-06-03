@@ -67,6 +67,9 @@ else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
 
+echo "WAITING FOR REVIEW"
+sleep 10000
+
 cluster_login
 
 helm repo add openshift-helm-charts https://charts.openshift.io/
@@ -79,9 +82,6 @@ helm install \
     --set global.clusterRouterBase="$K8S_CLUSTER_ROUTER_BASE" \
     ${DEPLOYMENT_NAME} openshift-helm-charts/redhat-developer-hub \
     --namespace ${NAME_SPACE} --create-namespace
-
-echo "WAITING FOR REVIEW"
-sleep 10000
 helm_test_until_success ${DEPLOYMENT_NAME} ${NAME_SPACE}
 
 echo "Starting Upgrade"
