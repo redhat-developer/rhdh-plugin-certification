@@ -11,7 +11,7 @@ OVERALL_RESULT=0
 
 cluster_login() {
 timeout --foreground 5m bash <<-"EOF"
-    while ! oc login --insecure-skip-tls-verify=true; do
+    while ! oc login --token=`oc whoami -t` --insecure-skip-tls-verify=true; do
             sleep 20
     done
 EOF
