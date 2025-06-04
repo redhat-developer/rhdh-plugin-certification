@@ -10,8 +10,10 @@ OVERALL_RESULT=0
 
 
 cluster_login() {
+    export kubefile=`ls /tmp | grep kube`
+    export KUBECONFIG="/tmp/${kubefile}"
 timeout --foreground 5m bash <<-"EOF"
-    while ! oc login --token=`oc whoami -t` --insecure-skip-tls-verify=true; do
+    while ! oc login -p `cat $KUBEADMIN_PASSWORD_FILE` -u kubeadmin --insecure-skip-tls-verify=true; do
             sleep 20
     done
 EOF
