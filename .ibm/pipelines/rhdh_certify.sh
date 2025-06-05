@@ -69,9 +69,6 @@ else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
 
-echo "WAITING FOR REVIEW"
-sleep 10000
-
 cluster_login
 
 helm repo add openshift-helm-charts https://charts.openshift.io/
