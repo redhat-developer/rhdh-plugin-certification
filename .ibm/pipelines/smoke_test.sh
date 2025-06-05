@@ -84,7 +84,7 @@ smoke_test() {
       echo "contents"
       ls
       ls "$REPORT_DIR"
-      echo "❌ Report directory '$REPORT_DIR' not found."
+      echo "Report directory '$REPORT_DIR' not found."
     fi
 
     cp -r "$REPORT_DIR/" "${ARTIFACT_DIR}/"
