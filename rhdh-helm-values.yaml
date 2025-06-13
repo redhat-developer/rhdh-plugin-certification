@@ -1,14 +1,14 @@
 global:
+  dynamic:
+    includes:
+      - "dynamic-plugins.default.yaml"
+    plugins:
+      - disabled: false
+        package: oci://quay.io/tkral/backstage-community-plugin-todo:v0.1.1!backstage-community-plugin-todo
   auth:
     backend:
       enabled: true
   clusterRouterBase: 'test.example.com'
-  dynamic:
-    plugins:
-      - disabled: false
-        package: oci://quay.io/tkral/backstage-community-plugin-todo:v0.1.1!backstage-community-plugin-todo
-    includes:
-      - 'dynamic-plugins.default.yaml'
 route:
   enabled: true
   host: '{{ .Values.global.host }}'
@@ -67,10 +67,10 @@ upstream:
     extraVolumeMounts:
       - mountPath: /opt/app-root/src/dynamic-plugins-root
         name: dynamic-plugins-root
-      - name: app-dist
-        mountPath: /opt/app-root/src/packages/app/dist
+      - name: static-vol
+        mountPath: /opt/app-root/src/packages/app/dist/static
     extraVolumes:
-      - name: app-dist
+      - name: static-vol
         emptyDir: {}
       - ephemeral:
           volumeClaimTemplate:
@@ -106,6 +106,12 @@ upstream:
       repository: rhdh/rhdh-hub-rhel9@sha256
       tag: d8268197ba0466643efb818fcad8f0fc29e32463f75b0f7f51d9ce75ec717572
     initContainers:
+      - name: copy-static
+        image: '{{ include "backstage.image" . }}'
+        command: ["cp", "-r", "/opt/app-root/src/packages/app/dist/static/.", "/static"]
+        volumeMounts:
+          - name: static-vol
+            mountPath: /static
       - command:
           - ./install-dynamic-plugins.sh
           - /dynamic-plugins-root

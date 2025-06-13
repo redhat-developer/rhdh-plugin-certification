@@ -75,7 +75,6 @@ helm repo add openshift-helm-charts https://charts.openshift.io/
 helm repo update
 
 echo "Starting helm install"
-sleep 10000
 
 helm install \
     -f ${HELM_CHART_VALUE_FILE_NAME_BASE} \
@@ -96,8 +95,6 @@ local url="https://${DEPLOYMENT_NAME}-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
 echo "$url"
 
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
-
-
 
 }
 
