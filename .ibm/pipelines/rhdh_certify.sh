@@ -95,7 +95,7 @@ local url="https://${DEPLOYMENT_NAME}-${NAME_SPACE}.${K8S_CLUSTER_ROUTER_BASE}"
 echo "$url"
 
 smoke_test "${DEPLOYMENT_NAME}" "${RELEASE_NAME}" "${NAME_SPACE}" "${url}"
-
+sleep 10000
 }
 
 main() {
