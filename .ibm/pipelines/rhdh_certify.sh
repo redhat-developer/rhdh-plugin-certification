@@ -54,6 +54,9 @@ export DEPLOYMENT_NAME="redhat-developer-hub"
 echo "DAN3"
 export HELM_CHART_VALUE_FILE_NAME_BASE="rhdh-helm-values.yaml"
 export K8S_CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=jsonpath='{.spec.host}' | sed 's/^[^.]*\.//')
+
+echo $HELM_CHART_VALUE_FILE_NAME_BASE
+echo $K8S_CLUSTER_ROUTER_BASE
 echo "DAN4"
 
 export IMAGE_LOC=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep image_loc | awk '{print $3}'`
