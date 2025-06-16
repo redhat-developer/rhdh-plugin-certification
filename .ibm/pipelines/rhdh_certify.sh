@@ -44,6 +44,8 @@ done
 
 handle_main() {
 
+sleep 10000
+
 export HOME=/tmp
 export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export NAME_SPACE="test-pipeline"
@@ -69,8 +71,6 @@ else
     echo "PLUGIN_FILE is valid: $PLUGIN_FILE"
 fi
 
-
-sleep 10000
 cluster_login
 
 helm repo add openshift-helm-charts https://charts.openshift.io/
