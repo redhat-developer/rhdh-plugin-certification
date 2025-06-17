@@ -45,6 +45,7 @@ done
 handle_main() {
 
 echo "DAN1"
+cluster_login
 
 export HOME=/tmp
 export DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -78,7 +79,6 @@ fi
 
 echo "DAN6"
 
-cluster_login
 
 
 echo "DAN7"
