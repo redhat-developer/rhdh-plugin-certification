@@ -65,7 +65,7 @@ smoke_test() {
     local namespace="$3"
     local timeout=${5:-600} # Timeout in seconds (default: 600 seconds)
 
-    local BASE_URL=$4
+    export BASE_URL=$4
     REPORT_DIR="playwright-report"
 
     # Ensure RHDH Repository Exists
