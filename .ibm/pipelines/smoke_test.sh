@@ -43,9 +43,9 @@ smoke_test() {
     local deployment_name="$1"
     local release_name="$2"
     local namespace="$3"
-    local BASE_URL=$4
     local timeout=${5:-600} # Timeout in seconds (default: 600 seconds)
-    
+
+    local BASE_URL=$4
     REPORT_DIR="playwright-report"
 
     # Ensure RHDH Repository Exists
@@ -75,6 +75,7 @@ smoke_test() {
     # working-directory: rhdh/e2e-tests
     echo "RUN PLAYWRIGHT TEST"
 
+    set -e
     yarn playwright test playwright/e2e/smoke-test.spec.ts --project="any-test"
 
     # Ensure the report exists
