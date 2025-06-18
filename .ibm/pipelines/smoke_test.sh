@@ -1,6 +1,17 @@
 # Define a cleanup function to be executed upon script exit.
 cleanup() {
   echo "Cleaning up before exiting"
+  # Ensure the report exists
+  if [ ! -d "$REPORT_DIR" ]; then
+    echo "Current dir"
+    pwd
+    echo "contents"
+    ls
+    ls "$REPORT_DIR"
+    echo "Report directory '$REPORT_DIR' not found."
+  fi
+
+  cp -r "$REPORT_DIR/" "${ARTIFACT_DIR}/"
   ARTIFACTS_URL="https://gcsweb-ci.apps.ci.l2s4.p1.openshiftapps.com/gcs/test-platform-results/pr-logs/pull/${REPO_OWNER}_${REPO_NAME}/${PULL_NUMBER}/${JOB_NAME}/${BUILD_ID}/artifacts/e2e-tests/redhat-developer-rhdh-certification/artifacts/playwright-report/index.html"
   echo "ARTIFACTS_URL: $ARTIFACTS_URL"
 }
