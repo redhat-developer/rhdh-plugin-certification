@@ -1,5 +1,5 @@
 global:
   dynamic:
     plugins:
-      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/apic-backstage:pr_1233__1.0.0!apic-backstage
+      - package: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/apic-backstage:next__1.0.0!apic-backstage
         disabled: false
