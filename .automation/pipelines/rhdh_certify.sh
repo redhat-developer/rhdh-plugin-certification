@@ -31,7 +31,6 @@ cleanup() {
 trap cleanup EXIT INT ERR
 
 SCRIPTS=(
-    "env_variables.sh"
     "smoke_test.sh"
     "utils.sh"
 )
