@@ -54,7 +54,7 @@ export K8S_CLUSTER_ROUTER_BASE=$(oc get route console -n openshift-console -o=js
 
 export IMAGE_LOC=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep image_loc | awk '{print $3}'`
 export IMAGE_VERSION=`git log -p --pretty=format: -- certified-plugins.yaml | grep '^[+-]' | grep -Ev '^\+\+\+|^---' | grep plugin_version | awk '{print $3}'`
-export PLUGIN_FILE=`git show --name-only --oneline HEAD | grep publishers`
+export PLUGIN_FILE=$(git diff --name-only main...HEAD | grep '^publishers/')
 
 # Check if PLUGIN_FILE is empty or contains multiple files
 if [[ -z "$PLUGIN_FILE" ]]; then
