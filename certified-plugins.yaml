@@ -5,3 +5,9 @@ certified:
     image_loc: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/dynatrace-backstage-plugin-dql
     plugin_version: pr_791__2.2.0!dynatrace-backstage-plugin-dql
     rhdh_version: null
+  - name: apic-backstage
+    authors: apiconnect
+    owners: dcurran90
+    image_loc: oci://ghcr.io/redhat-developer/rhdh-plugin-export-overlays/apic-backstage
+    plugin_version: next__1.0.0!apic-backstage
+    rhdh_version: null
